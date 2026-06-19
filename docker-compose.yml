@@ -41,8 +41,8 @@ services:
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:admin@localhost}
-      GOCARDLESS_SECRET_ID: ${GOCARDLESS_SECRET_ID:-}
-      GOCARDLESS_SECRET_KEY: ${GOCARDLESS_SECRET_KEY:-}
+      ENABLEBANKING_APP_ID: ${ENABLEBANKING_APP_ID:-}
+      ENABLEBANKING_PEM_BASE64: ${ENABLEBANKING_PEM_BASE64:-}
     volumes:
       - uploads:/app/uploads
     depends_on:
@@ -66,9 +66,9 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
-  # Pulls bank transactions into the inbox every 8h (GoCardless free tier allows
-  # ~4 transaction fetches/account/day; 8h = 3/day, leaving room for manual "Sync now").
-  # No-op unless GOCARDLESS_* secrets are set. Hits the same token-gated endpoint a cron would.
+  # Pulls bank transactions into the inbox every 8h (keeps well under bank consent
+  # rate limits, leaving room for manual "Sync now").
+  # No-op unless ENABLEBANKING_* is set. Hits the same token-gated endpoint a cron would.
   bank-cron:
     image: alpine:3
     restart: unless-stopped

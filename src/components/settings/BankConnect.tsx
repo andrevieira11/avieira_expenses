@@ -203,10 +203,10 @@ export function BankConnect({
       {notConfigured && (
         <p className="text-xs text-muted">
           Bank sync isn&apos;t configured yet. Add{" "}
-          <code className="rounded bg-surface-2 px-1">GOCARDLESS_SECRET_ID</code>{" "}
+          <code className="rounded bg-surface-2 px-1">ENABLEBANKING_APP_ID</code>{" "}
           and{" "}
           <code className="rounded bg-surface-2 px-1">
-            GOCARDLESS_SECRET_KEY
+            ENABLEBANKING_PEM_BASE64
           </code>{" "}
           to the server, then reload.
         </p>

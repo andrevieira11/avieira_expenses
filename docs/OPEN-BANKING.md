@@ -1,38 +1,51 @@
 # Automatic bank sync (moey! / Crédito Agrícola)
 
-This is the *truly automatic* moey! capture: instead of tapping a Shortcut, Saldo pulls
-your Crédito Agrícola / moey! transactions itself and drops them in the **Inbox** for you
-to categorize. It uses **GoCardless Bank Account Data** (the free, read-only Open Banking
-API, ex-Nordigen — Crédito Agrícola is supported).
+The *truly automatic* moey! capture: instead of tapping a Shortcut, Saldo pulls your
+Crédito Agrícola / moey! transactions itself and drops them in the **Inbox** to categorize.
+It uses **[Enable Banking](https://enablebanking.com)** — a PSD2 account-information
+aggregator that's **free for personal use** and supports Crédito Agrícola.
 
-Read-only: GoCardless can *see* transactions, never move money.
+Read-only: it can *see* transactions, never move money.
+
+> Why not GoCardless/Nordigen? GoCardless **closed Bank Account Data to new signups in
+> July 2025**, so Enable Banking is the working free path now.
 
 ---
 
-## 1. Get free GoCardless secrets (one time, ~5 min)
+## 1. Register an Enable Banking app (one time, ~10 min)
 
-1. Sign up at <https://bankaccountdata.gocardless.com/> (free — 50 connections/month).
-2. Verify your email and log in.
-3. Go to **Developers → User secrets → Create new**.
-4. Copy the **Secret ID** and **Secret key** (the key is shown once — copy it now).
+1. Sign in at <https://enablebanking.com/sign-in/> (Google or email — free).
+2. Open the **Control Panel** → **API applications** → **Create new application**.
+3. Choose environment **Production** (so you can connect your real account), and let the
+   browser **generate the key pair**. It downloads a file named `<application-id>.pem` to
+   your Downloads — **keep it safe, it's your private key.**
+4. Copy the **Application ID** (a UUID) shown for the app.
 
-## 2. Add them to the server
+> Enable Banking is free for personal use on your own accounts. If the app needs activating
+> for production, follow their prompt to whitelist your own bank account.
 
-On the Proxmox host, in the Saldo `.env`:
+## 2. Put the credentials on the server
+
+The private key must go into env as one line, so base64-encode it. On the Proxmox host
+(or your machine), in the folder with the `.pem`:
 
 ```bash
-GOCARDLESS_SECRET_ID=xxxxxxxx-....
-GOCARDLESS_SECRET_KEY=yyyyyyyy-....
+base64 -w0 saldo-<application-id>.pem        # macOS: base64 -i saldo-<application-id>.pem
 ```
 
-Then recreate the app so it picks them up:
+Copy the long output. Then in the Saldo `.env`:
+
+```bash
+ENABLEBANKING_APP_ID=<the application UUID>
+ENABLEBANKING_PEM_BASE64=<the base64 blob from above>
+```
+
+Confirm `NEXT_PUBLIC_APP_URL` is your real origin (e.g. `https://saldo.torpasweb.com`) — the
+bank redirects back to `…/api/banking/callback`. Then recreate the app:
 
 ```bash
 docker compose up -d
 ```
-
-(`NEXT_PUBLIC_APP_URL` must be your real origin, e.g. `https://saldo.torpasweb.com` — the
-bank redirects back to `…/api/banking/callback`.)
 
 ## 3. Connect your bank (in the app)
 
@@ -45,16 +58,16 @@ bank redirects back to `…/api/banking/callback`.)
 
 - A background job pulls new transactions **every 8 hours** into the Inbox.
 - Hit **Sync now** in Settings → Bank anytime to pull immediately.
-- New transactions land as **pending** in the Inbox; categorize them once and the
-  merchant/ID is remembered, so the same shop auto-categorizes next time.
+- New transactions land **pending** in the Inbox; categorize once and the merchant/ID is
+  remembered, so the same shop auto-categorizes next time.
 
 ## Good to know
 
-- **Consent expires every 90 days** (bank rule). When it lapses, the connection shows an
+- **Consent expires ~every 90 days** (bank rule). When it lapses, the connection shows an
   error — just **Connect a bank** again to re-approve. No data is lost.
-- **Free-tier rate limit:** ~4 transaction fetches per account per day. The 8-hour cron
-  uses 3/day, leaving one for manual syncs.
-- **Disable anytime:** remove the connection in Settings, or blank the `GOCARDLESS_*`
-  secrets. The one-tap moey! Shortcut keeps working regardless.
-- **Money signs:** bank debits import as expenses, credits as income — matching how you
-  add them by hand.
+- **Disable anytime:** remove the connection in Settings, or blank the `ENABLEBANKING_*`
+  vars. The one-tap moey! Shortcut keeps working regardless.
+- **Money signs:** bank debits import as expenses, credits as income — matching how you add
+  them by hand.
+- **Privacy:** the `.pem` private key is yours; it stays on your server and signs short-lived
+  tokens. Never commit it — only `ENABLEBANKING_PEM_BASE64` in `.env` (which is git-ignored).

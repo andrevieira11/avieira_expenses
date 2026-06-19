@@ -6,21 +6,23 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/db/client";
 import { bankConnections } from "@/db/schema";
 import { getActiveBook } from "@/lib/queries/active-book";
-import {
-  gcConfigured,
-  listInstitutions,
-  createAgreement,
-  createRequisition,
-} from "@/lib/banking/gocardless";
+import { ebConfigured, listAspsps, startAuth } from "@/lib/banking/enablebanking";
 import { syncBook } from "@/lib/banking/sync";
 
+const COUNTRY = "PT";
+
 export async function getInstitutions() {
-  if (!gcConfigured()) return { ok: false as const, error: "not_configured" };
+  if (!ebConfigured()) return { ok: false as const, error: "not_configured" };
   try {
-    const list = await listInstitutions("PT");
+    const list = await listAspsps(COUNTRY);
+    // Enable Banking identifies a bank by name + country, so the name is the id.
     return {
       ok: true as const,
-      institutions: list.map((i) => ({ id: i.id, name: i.name, logo: i.logo })),
+      institutions: list.map((a) => ({
+        id: a.name,
+        name: a.name,
+        logo: a.logo,
+      })),
     };
   } catch (e) {
     return { ok: false as const, error: e instanceof Error ? e.message : "error" };
@@ -34,30 +36,29 @@ export async function connectBank(
   try {
     const ctx = await getActiveBook();
     if (!ctx) return { ok: false as const, error: "Session expired" };
-    if (!gcConfigured())
-      return { ok: false as const, error: "GoCardless not configured" };
+    if (!ebConfigured())
+      return { ok: false as const, error: "Enable Banking not configured" };
 
-    const reference = createId();
-    const agreement = await createAgreement(institutionId);
+    const reference = createId(); // correlates the redirect (returned as ?state=)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-    const req = await createRequisition({
-      institutionId,
-      agreementId: agreement.id,
-      redirect: `${appUrl}/api/banking/callback`,
-      reference,
+    const auth = await startAuth({
+      aspspName: institutionId,
+      country: COUNTRY,
+      redirectUrl: `${appUrl}/api/banking/callback`,
+      state: reference,
     });
 
     await db.insert(bankConnections).values({
       bookId: ctx.book.id,
       institutionId,
       institutionName,
-      requisitionId: req.id,
+      requisitionId: auth.authorization_id, // becomes the session_id after consent
       reference,
-      agreementId: agreement.id,
+      agreementId: auth.authorization_id,
       status: "created",
     });
 
-    return { ok: true as const, link: req.link };
+    return { ok: true as const, link: auth.url };
   } catch (e) {
     return { ok: false as const, error: e instanceof Error ? e.message : "error" };
   }

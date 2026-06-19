@@ -8,7 +8,8 @@ import { relations } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 import { books } from "./books";
 
-/** A GoCardless requisition linking a bank (e.g. Crédito Agrícola / moey!) to a book. */
+/** An Enable Banking consent linking a bank (e.g. Crédito Agrícola / moey!) to a book.
+ *  `reference` correlates the consent redirect; `requisition_id` holds the session id. */
 export const bankConnections = pgTable(
   "bank_connections",
   {
