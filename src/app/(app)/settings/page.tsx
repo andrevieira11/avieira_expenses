@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Download } from "lucide-react";
 import { getActiveBook } from "@/lib/queries/active-book";
 import { PushToggle } from "@/components/settings/PushToggle";
@@ -13,6 +14,23 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-5">
       <PageHeader title="Definições" />
+
+      <Section title="Personalização" desc="Gere as tuas categorias e livros.">
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/settings/categories"
+            className="rounded-xl border border-hairline px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2"
+          >
+            Categorias
+          </Link>
+          <Link
+            href="/settings/books"
+            className="rounded-xl border border-hairline px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2"
+          >
+            Livros
+          </Link>
+        </div>
+      </Section>
 
       <Section
         title="Notificações"

@@ -4,11 +4,13 @@ import { budgetHealthVar } from "@/lib/colors";
 
 export function MonthSummary({
   spentCents,
+  incomeCents,
   budgetCents,
   count,
   currency,
 }: {
   spentCents: number;
+  incomeCents: number;
   budgetCents: number | null;
   count: number;
   currency: string;
@@ -17,6 +19,7 @@ export function MonthSummary({
   const savedCents = hasBudget ? budgetCents - spentCents : null;
   const ratio = hasBudget ? spentCents / budgetCents : 0;
   const pct = Math.min(100, Math.max(0, Math.round(ratio * 100)));
+  const hasIncome = incomeCents > 0;
 
   return (
     <div className="rounded-3xl border border-hairline bg-surface p-5">
@@ -64,6 +67,18 @@ export function MonthSummary({
             Define um orçamento
           </Link>
         </p>
+      )}
+
+      {hasIncome && (
+        <div className="mt-4 flex items-center justify-between border-t border-hairline pt-3 text-sm">
+          <span className="text-muted">Entradas</span>
+          <span
+            className="font-mono tabular-nums"
+            style={{ color: "var(--good)" }}
+          >
+            +{formatMoney(incomeCents, currency)}
+          </span>
+        </div>
       )}
     </div>
   );

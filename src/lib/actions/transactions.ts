@@ -112,7 +112,7 @@ async function maybeBudgetAlert(
     const budget = await resolveBudget(bookId, firstOfMonth(year, month));
     if (!budget.overallCents) return;
     const summary = await getMonthSummary(bookId, year, month);
-    const after = summary.netCents;
+    const after = summary.spentCents;
     const before = after - signedAmount(data.type, data.amountCents);
     if (before <= budget.overallCents && after > budget.overallCents) {
       await sendPushToUser(userId, {

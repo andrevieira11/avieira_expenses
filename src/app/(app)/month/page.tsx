@@ -39,7 +39,8 @@ export default async function MonthPage({
     <div className="space-y-6">
       <MonthNav year={year} month={month} />
       <MonthSummary
-        spentCents={summary.netCents}
+        spentCents={summary.spentCents}
+        incomeCents={summary.incomeCents}
         budgetCents={budget.overallCents}
         count={summary.count}
         currency={ctx.book.currency}

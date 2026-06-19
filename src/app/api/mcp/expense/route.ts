@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 const schema = z.object({
   amount: z.number().positive(),
-  type: z.enum(["expense", "refund"]).default("expense"),
+  type: z.enum(["expense", "income", "refund"]).default("expense"),
   category: z.string().optional(),
   subcategory: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
   }
 
   const cents = Math.round(d.amount * 100);
-  const amountCents = d.type === "refund" ? -cents : cents;
+  const amountCents = d.type === "expense" ? cents : -cents;
 
   const [tx] = await db
     .insert(transactions)

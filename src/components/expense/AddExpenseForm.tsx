@@ -23,7 +23,7 @@ export function AddExpenseForm({
     categoryId: null,
     subcategoryId: null,
   });
-  const [type, setType] = useState<"expense" | "refund">("expense");
+  const [type, setType] = useState<"expense" | "income" | "refund">("expense");
   const [txDate, setTxDate] = useState(todayYmd());
   const [note, setNote] = useState("");
   const [pending, setPending] = useState(false);
@@ -57,17 +57,21 @@ export function AddExpenseForm({
     <div className="mx-auto max-w-md space-y-6 pb-28">
       <div className="flex justify-center">
         <div className="inline-flex rounded-full border border-hairline bg-surface p-1 text-sm">
-          {(["expense", "refund"] as const).map((t) => (
+          {(["expense", "income", "refund"] as const).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setType(t)}
               className={cn(
-                "rounded-full px-4 py-1.5 font-medium transition",
+                "rounded-full px-3 py-1.5 font-medium transition",
                 type === t ? "bg-fg text-bg" : "text-muted",
               )}
             >
-              {t === "expense" ? "Despesa" : "Reembolso"}
+              {t === "expense"
+                ? "Despesa"
+                : t === "income"
+                  ? "Receita"
+                  : "Reembolso"}
             </button>
           ))}
         </div>

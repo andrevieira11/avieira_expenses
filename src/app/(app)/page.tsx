@@ -35,13 +35,13 @@ export default async function HomePage() {
 
   const firstName = ctx.user.name?.split(" ")[0] ?? "";
   const saved =
-    budget.overallCents != null ? budget.overallCents - summary.netCents : null;
+    budget.overallCents != null ? budget.overallCents - summary.spentCents : null;
 
   const daysInMonth = new Date(year, month, 0).getDate();
   const daysLeft = Math.max(1, daysInMonth - now.getDate() + 1);
   const safeToSpend =
     budget.overallCents != null
-      ? Math.max(0, Math.round((budget.overallCents - summary.netCents) / daysLeft))
+      ? Math.max(0, Math.round((budget.overallCents - summary.spentCents) / daysLeft))
       : null;
 
   return (
@@ -68,12 +68,12 @@ export default async function HomePage() {
 
       <div className="flex flex-col items-center gap-5 rounded-3xl border border-hairline bg-surface p-6">
         <BudgetGauge
-          spentCents={summary.netCents}
+          spentCents={summary.spentCents}
           budgetCents={budget.overallCents}
           currency={currency}
         />
         <div className="grid w-full grid-cols-3 divide-x divide-hairline text-center">
-          <Stat label="Gasto" value={formatMoney(summary.netCents, currency)} />
+          <Stat label="Gasto" value={formatMoney(summary.spentCents, currency)} />
           <Stat
             label="Orçamento"
             value={
@@ -95,6 +95,14 @@ export default async function HomePage() {
               {formatMoney(safeToSpend, currency)}
             </span>
             /dia até ao fim do mês
+          </p>
+        )}
+        {summary.incomeCents > 0 && (
+          <p className="text-xs text-muted">
+            Entradas:{" "}
+            <span className="font-semibold" style={{ color: "var(--good)" }}>
+              +{formatMoney(summary.incomeCents, currency)}
+            </span>
           </p>
         )}
       </div>

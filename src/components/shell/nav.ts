@@ -7,6 +7,7 @@ import {
   Target,
   PiggyBank,
   Repeat,
+  HandCoins,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -27,6 +28,7 @@ export const SECONDARY_NAV: NavItem[] = [
   { href: "/budgets", label: "Orçamentos", icon: Target },
   { href: "/subscriptions", label: "Subscrições", icon: Repeat },
   { href: "/goals", label: "Objetivos", icon: PiggyBank },
+  { href: "/splits", label: "Acertos", icon: HandCoins },
   { href: "/settings", label: "Definições", icon: Settings },
 ];
 

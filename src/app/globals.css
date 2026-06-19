@@ -99,6 +99,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Tailwind v4 no longer sets pointer on buttons — restore it for interactive elements. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  label[for],
+  summary,
+  select:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 /* Respect the iOS notch / home indicator for bottom-fixed UI. */
 @utility pb-safe {
   padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);

@@ -9,3 +9,4 @@ export * from "./budgets";
 export * from "./recurring";
 export * from "./goals";
 export * from "./push";
+export * from "./splits";

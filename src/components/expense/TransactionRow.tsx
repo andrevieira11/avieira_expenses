@@ -1,5 +1,5 @@
 import { categoryColor } from "@/lib/colors";
-import { formatMoney } from "@/lib/money";
+import { formatFlow } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import type { MonthTransaction } from "@/lib/queries/transactions";
 
@@ -46,7 +46,7 @@ export function TransactionRow({
           isCredit ? "text-good" : "text-fg",
         )}
       >
-        {formatMoney(tx.amountCents)}
+        {formatFlow(tx.amountCents)}
       </span>
     </Wrapper>
   );

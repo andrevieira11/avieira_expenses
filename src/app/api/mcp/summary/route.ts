@@ -34,11 +34,13 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     month: ym,
     currency: book.currency,
-    spent_eur: eur(summary.netCents),
+    spent_eur: eur(summary.spentCents),
+    income_eur: eur(summary.incomeCents),
+    balance_eur: eur(summary.balanceCents),
     budget_eur: budget.overallCents != null ? eur(budget.overallCents) : null,
     saved_eur:
       budget.overallCents != null
-        ? eur(budget.overallCents - summary.netCents)
+        ? eur(budget.overallCents - summary.spentCents)
         : null,
     transactions: summary.count,
     top_categories: cats

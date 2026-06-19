@@ -36,9 +36,7 @@ export function EditExpenseSheet({
     categoryId: tx.categoryId,
     subcategoryId: tx.subcategoryId,
   });
-  const [type, setType] = useState<"expense" | "refund">(
-    tx.type === "expense" ? "expense" : "refund",
-  );
+  const [type, setType] = useState<"expense" | "income" | "refund">(tx.type);
   const [txDate, setTxDate] = useState(tx.txDate);
   const [note, setNote] = useState(tx.note ?? "");
   const [pending, setPending] = useState(false);
@@ -109,17 +107,21 @@ export function EditExpenseSheet({
 
         <div className="mb-4 flex justify-center">
           <div className="inline-flex rounded-full border border-hairline bg-surface p-1 text-sm">
-            {(["expense", "refund"] as const).map((t) => (
+            {(["expense", "income", "refund"] as const).map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setType(t)}
                 className={cn(
-                  "rounded-full px-4 py-1.5 font-medium transition",
+                  "rounded-full px-3 py-1.5 font-medium transition",
                   type === t ? "bg-fg text-bg" : "text-muted",
                 )}
               >
-                {t === "expense" ? "Despesa" : "Reembolso"}
+                {t === "expense"
+                  ? "Despesa"
+                  : t === "income"
+                    ? "Receita"
+                    : "Reembolso"}
               </button>
             ))}
           </div>

@@ -33,6 +33,19 @@ export function formatSignedMoney(
   return `${sign}${fmt(currency).format(Math.abs(cents) / 100)}`;
 }
 
+/**
+ * Display a transaction as a money flow: money-in (negative cents) shows "+X",
+ * money-out shows "X". Pair with a green color for credits at the call site.
+ */
+export function formatFlow(
+  cents: number | null | undefined,
+  currency = "EUR",
+): string {
+  if (cents == null) return "—";
+  if (cents < 0) return `+${formatMoney(-cents, currency)}`;
+  return formatMoney(cents, currency);
+}
+
 /** Convert a decimal euro amount (e.g. 12.34) to integer cents, rounding safely. */
 export function toCents(euros: number): number {
   return Math.round(euros * 100);

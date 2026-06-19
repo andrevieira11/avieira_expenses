@@ -42,17 +42,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8 text-center">
-        <div className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Saldo
-        </div>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="text-2xl font-semibold tracking-tight text-fg">Saldo</div>
+        <p className="mt-1 text-sm text-muted">
           {isSignup ? "Cria a tua conta" : "Bem-vindo de volta"}
         </p>
       </div>
 
       <form
         onSubmit={onSubmit}
-        className="space-y-4 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+        className="space-y-4 rounded-3xl border border-hairline bg-surface p-6 shadow-sm"
       >
         {isSignup && (
           <Field
@@ -82,32 +80,36 @@ export function AuthForm({ mode }: { mode: Mode }) {
           required
         />
 
-        {error && (
-          <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>
-        )}
+        {error && <p className="text-sm text-over">{error}</p>}
 
         <button
           type="submit"
           disabled={pending}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-60"
         >
           {pending && <Loader2 className="h-4 w-4 animate-spin" />}
           {isSignup ? "Criar conta" : "Entrar"}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mt-6 text-center text-sm text-muted">
         {isSignup ? (
           <>
             Já tens conta?{" "}
-            <Link href="/login" className="font-medium text-zinc-900 underline-offset-4 hover:underline dark:text-zinc-100">
+            <Link
+              href="/login"
+              className="font-medium text-fg underline-offset-4 hover:underline"
+            >
               Entrar
             </Link>
           </>
         ) : (
           <>
             Ainda não tens conta?{" "}
-            <Link href="/signup" className="font-medium text-zinc-900 underline-offset-4 hover:underline dark:text-zinc-100">
+            <Link
+              href="/signup"
+              className="font-medium text-fg underline-offset-4 hover:underline"
+            >
               Criar conta
             </Link>
           </>
@@ -129,13 +131,11 @@ function Field({
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value">) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-        {label}
-      </span>
+      <span className="mb-1.5 block text-sm font-medium text-fg">{label}</span>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50 dark:focus:border-zinc-500"
+        className="w-full rounded-2xl border border-hairline bg-bg px-3.5 py-2.5 text-sm text-fg outline-none transition placeholder:text-muted focus:border-muted"
         {...props}
       />
     </label>

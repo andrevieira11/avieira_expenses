@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Inbox, CircleCheck } from "lucide-react";
 import { EditExpenseSheet } from "@/components/expense/EditExpenseSheet";
-import { formatMoney } from "@/lib/money";
+import { formatFlow } from "@/lib/money";
 import { categoryColor } from "@/lib/colors";
 import type { MonthTransaction } from "@/lib/queries/transactions";
 import type { CategoryWithSubs } from "@/lib/queries/categories";
@@ -59,7 +59,7 @@ export function PendingInbox({
                 </p>
               </div>
               <span className="shrink-0 font-mono text-sm tabular-nums">
-                {tx.amountCents == null ? "— €" : formatMoney(tx.amountCents, currency)}
+                {tx.amountCents == null ? "— €" : formatFlow(tx.amountCents, currency)}
               </span>
             </button>
           );
