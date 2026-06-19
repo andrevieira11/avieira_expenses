@@ -6,6 +6,7 @@ import { getPendingCount } from "@/lib/queries/transactions";
 import { ACTIVE_BOOK_COOKIE } from "@/lib/constants";
 import { BookProvider } from "@/lib/book-context";
 import { AppShell } from "@/components/shell/AppShell";
+import { SyncOnOpen } from "@/components/banking/SyncOnOpen";
 
 export default async function AppLayout({
   children,
@@ -30,6 +31,7 @@ export default async function AppLayout({
 
   return (
     <BookProvider books={books} activeBookId={activeBookId}>
+      <SyncOnOpen />
       <AppShell
         user={{ name: session.user.name, email: session.user.email }}
         pendingCount={pendingCount}
