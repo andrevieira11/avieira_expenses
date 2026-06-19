@@ -11,6 +11,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { books } from "./books";
 import { user } from "./auth";
 import { transactions } from "./transactions";
+import { categories, subcategories } from "./categories";
 
 /** A shared expense ("acerto") split among people — track who has paid you back. */
 export const splits = pgTable(
@@ -24,6 +25,13 @@ export const splits = pgTable(
       .references(() => books.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
     totalCents: integer("total_cents").notNull().default(0),
+    // Where the income lands when a participant pays.
+    categoryId: text("category_id").references(() => categories.id, {
+      onDelete: "set null",
+    }),
+    subcategoryId: text("subcategory_id").references(() => subcategories.id, {
+      onDelete: "set null",
+    }),
     createdBy: text("created_by")
       .notNull()
       .references(() => user.id, { onDelete: "restrict" }),

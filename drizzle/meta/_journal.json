@@ -43,6 +43,13 @@
       "when": 1781887938123,
       "tag": "0005_nebulous_wasp",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781894301648,
+      "tag": "0006_wise_firelord",
+      "breakpoints": true
     }
   ]
 }

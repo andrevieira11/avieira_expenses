@@ -3,9 +3,12 @@ import { getActiveBook } from "@/lib/queries/active-book";
 import {
   getYearMonthlyTotals,
   getYearCategoryTotals,
+  getYearSubcategoryTotals,
+  getYearCategoryMatrix,
 } from "@/lib/queries/transactions";
 import { CategoryBreakdown } from "@/components/month/CategoryBreakdown";
 import { YearBars } from "@/components/year/YearBars";
+import { MonthlyComparisonChart } from "@/components/year/MonthlyComparisonChart";
 import { YearNav } from "@/components/year/YearNav";
 import { formatMoney } from "@/lib/money";
 
@@ -23,9 +26,11 @@ export default async function YearPage({
   const year =
     sp.y && /^\d{4}$/.test(sp.y) ? Number(sp.y) : new Date().getFullYear();
 
-  const [monthly, catTotals] = await Promise.all([
+  const [monthly, catTotals, subTotals, matrix] = await Promise.all([
     getYearMonthlyTotals(ctx.book.id, year),
     getYearCategoryTotals(ctx.book.id, year),
+    getYearSubcategoryTotals(ctx.book.id, year),
+    getYearCategoryMatrix(ctx.book.id, year),
   ]);
 
   const total = monthly.reduce((s, m) => s + m.netCents, 0);
@@ -45,7 +50,12 @@ export default async function YearPage({
         </p>
       </div>
       <YearBars year={year} data={monthly} />
-      <CategoryBreakdown items={catTotals} currency={ctx.book.currency} />
+      <MonthlyComparisonChart data={matrix.data} categories={matrix.categories} />
+      <CategoryBreakdown
+        items={catTotals}
+        subcategories={subTotals}
+        currency={ctx.book.currency}
+      />
     </div>
   );
 }

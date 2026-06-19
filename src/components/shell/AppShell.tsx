@@ -16,7 +16,7 @@ export function AppShell({
       <Sidebar pendingCount={pendingCount} />
       <div className="flex min-h-[100dvh] flex-col">
         <Topbar user={user} />
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-28 pt-5 md:px-8 md:pb-10">
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-28 pt-7 md:px-8 md:pb-10 md:pt-9">
           {children}
         </main>
       </div>

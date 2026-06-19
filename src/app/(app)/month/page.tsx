@@ -3,6 +3,7 @@ import { getActiveBook } from "@/lib/queries/active-book";
 import {
   getMonthSummary,
   getMonthCategoryTotals,
+  getMonthSubcategoryTotals,
   getMonthTransactions,
 } from "@/lib/queries/transactions";
 import { getBookCategories } from "@/lib/queries/categories";
@@ -27,13 +28,15 @@ export default async function MonthPage({
   const ym = sp.m && /^\d{4}-\d{2}$/.test(sp.m) ? sp.m : todayYmd().slice(0, 7);
   const { year, month } = parseYearMonth(ym);
 
-  const [summary, catTotals, txs, categories, budget] = await Promise.all([
-    getMonthSummary(ctx.book.id, year, month),
-    getMonthCategoryTotals(ctx.book.id, year, month),
-    getMonthTransactions(ctx.book.id, year, month),
-    getBookCategories(ctx.book.id),
-    resolveBudget(ctx.book.id, firstOfMonth(year, month)),
-  ]);
+  const [summary, catTotals, subTotals, txs, categories, budget] =
+    await Promise.all([
+      getMonthSummary(ctx.book.id, year, month),
+      getMonthCategoryTotals(ctx.book.id, year, month),
+      getMonthSubcategoryTotals(ctx.book.id, year, month),
+      getMonthTransactions(ctx.book.id, year, month),
+      getBookCategories(ctx.book.id),
+      resolveBudget(ctx.book.id, firstOfMonth(year, month)),
+    ]);
 
   return (
     <div className="space-y-6">
@@ -45,7 +48,11 @@ export default async function MonthPage({
         count={summary.count}
         currency={ctx.book.currency}
       />
-      <CategoryBreakdown items={catTotals} currency={ctx.book.currency} />
+      <CategoryBreakdown
+        items={catTotals}
+        subcategories={subTotals}
+        currency={ctx.book.currency}
+      />
       <EditableTransactionList
         transactions={txs}
         categories={categories}

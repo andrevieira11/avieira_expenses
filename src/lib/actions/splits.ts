@@ -12,6 +12,8 @@ export type ActionResult = { ok: true } | { ok: false; error: string };
 
 const createSchema = z.object({
   title: z.string().trim().min(1).max(80),
+  categoryId: z.string().min(1).nullable().optional(),
+  subcategoryId: z.string().min(1).nullable().optional(),
   participants: z
     .array(
       z.object({
@@ -38,6 +40,8 @@ export async function createSplit(
         bookId: ctx.book.id,
         title: data.title,
         totalCents: total,
+        categoryId: data.categoryId ?? null,
+        subcategoryId: data.subcategoryId ?? null,
         createdBy: ctx.user.id,
       })
       .returning({ id: splits.id });
@@ -73,6 +77,8 @@ export async function markParticipantPaid(
         paid: splitParticipants.paid,
         title: splits.title,
         bookId: splits.bookId,
+        categoryId: splits.categoryId,
+        subcategoryId: splits.subcategoryId,
       })
       .from(splitParticipants)
       .innerJoin(splits, eq(splits.id, splitParticipants.splitId))
@@ -92,6 +98,8 @@ export async function markParticipantPaid(
         status: "confirmed",
         source: "manual",
         txDate: todayYmd(),
+        categoryId: row.categoryId,
+        subcategoryId: row.subcategoryId,
         merchant: row.name,
         note: `Acerto: ${row.title}`,
         createdBy: ctx.user.id,

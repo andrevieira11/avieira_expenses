@@ -125,7 +125,7 @@ body {
   padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
 }
 @utility pt-safe {
-  padding-top: max(env(safe-area-inset-top), 0px);
+  padding-top: max(env(safe-area-inset-top), 0.75rem);
 }
 
 @media (prefers-reduced-motion: reduce) {

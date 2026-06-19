@@ -1,7 +1,7 @@
 import { and, eq, ne, gte, lt, desc, sql, or, ilike } from "drizzle-orm";
 import { db } from "@/db/client";
 import { transactions, categories, subcategories } from "@/db/schema";
-import { monthRange, yearRange } from "@/lib/dates";
+import { monthRange, yearRange, monthShort } from "@/lib/dates";
 
 // Money model: expense > 0 (out); income/refund < 0 (in). "Spending" = everything
 // except income (so refunds reduce spending). Income is tracked separately.
@@ -236,6 +236,105 @@ export async function getYearCategoryTotals(
     )
     .groupBy(categories.id, categories.name, categories.color)
     .orderBy(desc(sql`sum(${transactions.amountCents})`));
+}
+
+/** Per-subcategory spending for a month (income excluded), with parent category id. */
+export async function getMonthSubcategoryTotals(
+  bookId: string,
+  year: number,
+  month: number,
+) {
+  const { start, endExclusive } = monthRange(year, month);
+  return db
+    .select({
+      categoryId: subcategories.categoryId,
+      subcategoryId: subcategories.id,
+      name: subcategories.name,
+      netCents: sql<number>`coalesce(sum(${transactions.amountCents}), 0)::int`,
+    })
+    .from(transactions)
+    .innerJoin(subcategories, eq(subcategories.id, transactions.subcategoryId))
+    .where(
+      and(
+        eq(transactions.bookId, bookId),
+        eq(transactions.status, "confirmed"),
+        ne(transactions.type, "income"),
+        gte(transactions.txDate, start),
+        lt(transactions.txDate, endExclusive),
+      ),
+    )
+    .groupBy(subcategories.id, subcategories.categoryId, subcategories.name)
+    .orderBy(desc(sql`sum(${transactions.amountCents})`));
+}
+
+export async function getYearSubcategoryTotals(bookId: string, year: number) {
+  const { start, endExclusive } = yearRange(year);
+  return db
+    .select({
+      categoryId: subcategories.categoryId,
+      subcategoryId: subcategories.id,
+      name: subcategories.name,
+      netCents: sql<number>`coalesce(sum(${transactions.amountCents}), 0)::int`,
+    })
+    .from(transactions)
+    .innerJoin(subcategories, eq(subcategories.id, transactions.subcategoryId))
+    .where(
+      and(
+        eq(transactions.bookId, bookId),
+        eq(transactions.status, "confirmed"),
+        ne(transactions.type, "income"),
+        gte(transactions.txDate, start),
+        lt(transactions.txDate, endExclusive),
+      ),
+    )
+    .groupBy(subcategories.id, subcategories.categoryId, subcategories.name)
+    .orderBy(desc(sql`sum(${transactions.amountCents})`));
+}
+
+export type SubcategoryTotal = Awaited<
+  ReturnType<typeof getMonthSubcategoryTotals>
+>[number];
+
+/** Pivoted monthly spending by category (euros) for the stacked comparison chart. */
+export async function getYearCategoryMatrix(bookId: string, year: number) {
+  const { start, endExclusive } = yearRange(year);
+  const rows = await db
+    .select({
+      m: sql<number>`extract(month from ${transactions.txDate})::int`,
+      name: categories.name,
+      color: categories.color,
+      cents: sql<number>`coalesce(sum(${transactions.amountCents}), 0)::int`,
+    })
+    .from(transactions)
+    .innerJoin(categories, eq(categories.id, transactions.categoryId))
+    .where(
+      and(
+        eq(transactions.bookId, bookId),
+        eq(transactions.status, "confirmed"),
+        ne(transactions.type, "income"),
+        gte(transactions.txDate, start),
+        lt(transactions.txDate, endExclusive),
+      ),
+    )
+    .groupBy(
+      sql`extract(month from ${transactions.txDate})`,
+      categories.name,
+      categories.color,
+    );
+
+  const catMap = new Map<string, string>();
+  for (const r of rows) if (!catMap.has(r.name)) catMap.set(r.name, r.color);
+  const cats = [...catMap.entries()].map(([name, color]) => ({ name, color }));
+
+  const data = Array.from({ length: 12 }, (_, i) => {
+    const month = i + 1;
+    const o: Record<string, number | string> = { month: monthShort(year, month) };
+    for (const c of cats) o[c.name] = 0;
+    for (const r of rows) if (r.m === month) o[r.name] = r.cents / 100;
+    return o;
+  });
+
+  return { data, categories: cats };
 }
 
 /** Every transaction in a book, flattened for CSV export. */

@@ -15,13 +15,16 @@ import type { SplitWithParticipants } from "@/lib/queries/splits";
 
 export function SplitsManager({
   splits,
+  categories,
   currency,
 }: {
   splits: SplitWithParticipants[];
+  categories: { id: string; name: string }[];
   currency: string;
 }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [rows, setRows] = useState([{ name: "", amount: "" }]);
   const [busy, setBusy] = useState(false);
 
@@ -38,8 +41,13 @@ export function SplitsManager({
       .filter((p) => p.name && p.shareCents > 0);
     if (!title.trim() || participants.length === 0) return;
     setBusy(true);
-    await createSplit({ title: title.trim(), participants });
+    await createSplit({
+      title: title.trim(),
+      categoryId: categoryId || null,
+      participants,
+    });
     setTitle("");
+    setCategoryId("");
     setRows([{ name: "", amount: "" }]);
     setBusy(false);
     router.refresh();
@@ -55,6 +63,18 @@ export function SplitsManager({
           maxLength={80}
           className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm outline-none placeholder:text-muted focus:border-muted"
         />
+        <select
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+          className="w-full rounded-xl border border-hairline bg-bg px-3 py-2.5 text-sm outline-none focus:border-muted"
+        >
+          <option value="">Categoria da receita (opcional)</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
         {rows.map((r, i) => (
           <div key={i} className="flex gap-2">
             <input
