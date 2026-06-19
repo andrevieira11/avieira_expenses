@@ -7,7 +7,7 @@ import {
 import { BooksManager } from "@/components/books/BooksManager";
 import { PageHeader } from "@/components/ui/PageHeader";
 
-export const metadata = { title: "Livros" };
+export const metadata = { title: "Books" };
 
 export default async function BooksPage() {
   const session = await getServerSession();
@@ -19,8 +19,8 @@ export default async function BooksPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Livros"
-        subtitle="Cria, partilha e gere os teus livros (pessoal + conjunto)."
+        title="Books"
+        subtitle="Create, share and manage your books (personal + shared)."
       />
       <BooksManager books={books} members={members} />
     </div>

@@ -14,7 +14,7 @@ import { MonthSummary } from "@/components/month/MonthSummary";
 import { CategoryBreakdown } from "@/components/month/CategoryBreakdown";
 import { EditableTransactionList } from "@/components/expense/EditableTransactionList";
 
-export const metadata = { title: "Mês" };
+export const metadata = { title: "Month" };
 
 export default async function MonthPage({
   searchParams,
@@ -57,7 +57,7 @@ export default async function MonthPage({
         transactions={txs}
         categories={categories}
         currency={ctx.book.currency}
-        emptyHint="Adiciona a tua primeira despesa deste mês."
+        emptyHint="Add your first expense this month."
       />
     </div>
   );

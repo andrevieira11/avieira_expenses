@@ -24,7 +24,7 @@ export function UserMenu({ user }: { user: { name: string; email: string } }) {
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="grid h-9 w-9 place-items-center rounded-full bg-brand text-sm font-semibold text-white"
-        aria-label="Conta"
+        aria-label="Account"
       >
         {initials}
       </button>
@@ -61,7 +61,7 @@ export function UserMenu({ user }: { user: { name: string; email: string } }) {
               className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-fg hover:bg-surface-2"
             >
               <LogOut className="h-4 w-4" />
-              Terminar sessão
+              Sign out
             </button>
           </div>
         </>

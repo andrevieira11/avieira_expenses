@@ -5,7 +5,7 @@ import { getBookCategories } from "@/lib/queries/categories";
 import { SubscriptionsManager } from "@/components/subscriptions/SubscriptionsManager";
 import { PageHeader } from "@/components/ui/PageHeader";
 
-export const metadata = { title: "Subscrições" };
+export const metadata = { title: "Subscriptions" };
 
 export default async function SubscriptionsPage() {
   const ctx = await getActiveBook();
@@ -25,8 +25,8 @@ export default async function SubscriptionsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Subscrições"
-        subtitle="Despesas recorrentes e renovações."
+        title="Subscriptions"
+        subtitle="Recurring expenses and renewals."
       />
       <SubscriptionsManager
         recurring={recurring}

@@ -13,7 +13,7 @@ export function EditableTransactionList({
   transactions,
   categories,
   currency,
-  emptyHint = "Adiciona a tua primeira despesa.",
+  emptyHint = "Add your first expense.",
 }: {
   transactions: MonthTransaction[];
   categories: CategoryWithSubs[];
@@ -26,7 +26,7 @@ export function EditableTransactionList({
     return (
       <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-hairline py-14 text-center">
         <Receipt className="h-7 w-7 text-muted" />
-        <p className="mt-3 text-sm font-medium">Ainda sem movimentos</p>
+        <p className="mt-3 text-sm font-medium">No transactions yet</p>
         <p className="mt-1 text-xs text-muted">{emptyHint}</p>
       </div>
     );

@@ -16,20 +16,20 @@ export type NavItem = { href: string; label: string; icon: LucideIcon };
 
 /** Bottom tab bar (mobile) — 4 destinations around the center Add button. */
 export const PRIMARY_NAV: NavItem[] = [
-  { href: "/", label: "Início", icon: House },
-  { href: "/month", label: "Mês", icon: CalendarRange },
-  { href: "/year", label: "Ano", icon: ChartColumnBig },
+  { href: "/", label: "Home", icon: House },
+  { href: "/month", label: "Month", icon: CalendarRange },
+  { href: "/year", label: "Year", icon: ChartColumnBig },
   { href: "/inbox", label: "Inbox", icon: Inbox },
 ];
 
 /** Extra destinations shown in the desktop sidebar. */
 export const SECONDARY_NAV: NavItem[] = [
-  { href: "/transactions", label: "Movimentos", icon: ReceiptText },
-  { href: "/budgets", label: "Orçamentos", icon: Target },
-  { href: "/subscriptions", label: "Subscrições", icon: Repeat },
-  { href: "/goals", label: "Objetivos", icon: PiggyBank },
-  { href: "/splits", label: "Acertos", icon: HandCoins },
-  { href: "/settings", label: "Definições", icon: Settings },
+  { href: "/transactions", label: "Transactions", icon: ReceiptText },
+  { href: "/budgets", label: "Budgets", icon: Target },
+  { href: "/subscriptions", label: "Subscriptions", icon: Repeat },
+  { href: "/goals", label: "Goals", icon: PiggyBank },
+  { href: "/splits", label: "Splits", icon: HandCoins },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 /** Active when the path equals the item or is nested under it (but "/" only exact). */

@@ -25,7 +25,7 @@ export async function createRecurring(
 ): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     const data = createSchema.parse(input);
 
     if (data.categoryId) {
@@ -39,7 +39,7 @@ export async function createRecurring(
           ),
         )
         .limit(1);
-      if (!c.length) return { ok: false, error: "Categoria inválida" };
+      if (!c.length) return { ok: false, error: "Invalid category" };
     }
 
     await db.insert(recurringExpenses).values({
@@ -56,14 +56,14 @@ export async function createRecurring(
     revalidatePath("/subscriptions");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
 export async function deleteRecurring(id: string): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     await db
       .delete(recurringExpenses)
       .where(
@@ -75,7 +75,7 @@ export async function deleteRecurring(id: string): Promise<ActionResult> {
     revalidatePath("/subscriptions");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
@@ -83,7 +83,7 @@ export async function deleteRecurring(id: string): Promise<ActionResult> {
 export async function payRecurring(id: string): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
 
     const [r] = await db
       .select()
@@ -95,7 +95,7 @@ export async function payRecurring(id: string): Promise<ActionResult> {
         ),
       )
       .limit(1);
-    if (!r) return { ok: false, error: "Subscrição não encontrada" };
+    if (!r) return { ok: false, error: "Subscription not found" };
 
     await db.insert(transactions).values({
       bookId: ctx.book.id,
@@ -123,6 +123,6 @@ export async function payRecurring(id: string): Promise<ActionResult> {
     revalidatePath("/month");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }

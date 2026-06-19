@@ -39,7 +39,7 @@ export function BooksManager({
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Nome do livro (ex: Casa)"
+          placeholder="Book name (e.g. Home)"
           maxLength={60}
           className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm outline-none placeholder:text-muted focus:border-muted"
         />
@@ -54,7 +54,7 @@ export function BooksManager({
                   type === t ? "bg-fg text-bg" : "text-muted",
                 )}
               >
-                {t === "personal" ? "Pessoal" : "Partilhado"}
+                {t === "personal" ? "Personal" : "Shared"}
               </button>
             ))}
           </div>
@@ -64,7 +64,7 @@ export function BooksManager({
             className="ml-auto inline-flex items-center gap-2 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
           >
             <Plus className="h-4 w-4" />
-            Criar livro
+            Create book
           </button>
         </div>
       </div>
@@ -122,8 +122,8 @@ function BookCard({
         <div>
           <p className="font-medium">{book.name}</p>
           <p className="text-xs text-muted">
-            {book.type === "shared" ? "Partilhado" : "Pessoal"} ·{" "}
-            {isOwner ? "Dono" : "Membro"}
+            {book.type === "shared" ? "Shared" : "Personal"} ·{" "}
+            {isOwner ? "Owner" : "Member"}
           </p>
         </div>
         {!isOwner && (
@@ -133,7 +133,7 @@ function BookCard({
             className="inline-flex items-center gap-2 rounded-xl border border-hairline px-3 py-1.5 text-sm text-over transition hover:bg-surface-2"
           >
             <LogOut className="h-4 w-4" />
-            Sair
+            Leave
           </button>
         )}
       </div>
@@ -145,7 +145,7 @@ function BookCard({
               <span className="truncate">
                 {m.name}
                 {m.role === "owner" && (
-                  <span className="ml-1 text-xs text-muted">(dono)</span>
+                  <span className="ml-1 text-xs text-muted">(owner)</span>
                 )}
               </span>
               {isOwner && m.role !== "owner" && (
@@ -153,7 +153,7 @@ function BookCard({
                   onClick={() => kick(m.userId)}
                   disabled={busy}
                   className="grid h-7 w-7 place-items-center rounded-full text-muted hover:text-over"
-                  aria-label="Remover"
+                  aria-label="Remove"
                 >
                   <UserMinus className="h-4 w-4" />
                 </button>
@@ -176,7 +176,7 @@ function BookCard({
               <button
                 onClick={copy}
                 className="grid h-8 w-8 place-items-center rounded-xl border border-hairline hover:bg-surface-2"
-                aria-label="Copiar"
+                aria-label="Copy"
               >
                 {copied ? (
                   <Check className="h-4 w-4 text-good" />
@@ -192,11 +192,11 @@ function BookCard({
               className="inline-flex items-center gap-2 rounded-xl border border-hairline px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2"
             >
               <Link2 className="h-4 w-4" />
-              Gerar link de convite
+              Generate invite link
             </button>
           )}
           <p className="mt-2 text-xs text-muted">
-            Partilha o link. Quem o abrir e iniciar sessão junta-se a este livro.
+            Share the link. Anyone who opens it and signs in joins this book.
           </p>
         </div>
       )}

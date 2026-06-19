@@ -23,9 +23,9 @@ export function PendingInbox({
     return (
       <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-hairline py-16 text-center">
         <CircleCheck className="h-8 w-8 text-good" />
-        <p className="mt-3 text-sm font-medium">Inbox vazia</p>
+        <p className="mt-3 text-sm font-medium">Inbox empty</p>
         <p className="mt-1 text-xs text-muted">
-          Sem capturas do moey! por categorizar.
+          No moey! captures to categorize.
         </p>
       </div>
     );
@@ -50,12 +50,12 @@ export function PendingInbox({
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">
-                  {tx.merchant || "Movimento moey!"}
+                  {tx.merchant || "moey! transaction"}
                 </p>
                 <p className="truncate text-xs text-muted">
                   {tx.categoryName
-                    ? `Sugestão: ${tx.categoryName}`
-                    : "Toca para categorizar"}
+                    ? `Suggestion: ${tx.categoryName}`
+                    : "Tap to categorize"}
                 </p>
               </div>
               <span className="shrink-0 font-mono text-sm tabular-nums">

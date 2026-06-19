@@ -59,7 +59,7 @@ export function BookSwitcher() {
               className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-surface-2"
             >
               <Settings2 className="h-4 w-4 text-muted" />
-              Gerir livros
+              Manage books
             </Link>
           </div>
         </>

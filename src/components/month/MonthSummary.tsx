@@ -25,7 +25,7 @@ export function MonthSummary({
     <div className="rounded-3xl border border-hairline bg-surface p-5">
       <div className="flex items-end justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-sm text-muted">Gasto este mês</p>
+          <p className="text-sm text-muted">Spent this month</p>
           <p className="mt-1 font-mono text-3xl font-semibold tabular-nums">
             {formatMoney(spentCents, currency)}
           </p>
@@ -33,7 +33,7 @@ export function MonthSummary({
         {hasBudget && (
           <div className="shrink-0 text-right">
             <p className="text-sm text-muted">
-              {savedCents! >= 0 ? "Poupado" : "Acima"}
+              {savedCents! >= 0 ? "Saved" : "Over"}
             </p>
             <p
               className="mt-1 font-mono text-lg font-semibold tabular-nums"
@@ -55,23 +55,23 @@ export function MonthSummary({
           </div>
           <div className="mt-1.5 flex justify-between text-xs text-muted">
             <span>
-              {count} {count === 1 ? "movimento" : "movimentos"}
+              {count} {count === 1 ? "transaction" : "transactions"}
             </span>
-            <span>Orçamento {formatMoney(budgetCents, currency)}</span>
+            <span>Budget {formatMoney(budgetCents, currency)}</span>
           </div>
         </div>
       ) : (
         <p className="mt-2 text-xs text-muted">
-          {count} {count === 1 ? "movimento" : "movimentos"} ·{" "}
+          {count} {count === 1 ? "transaction" : "transactions"} ·{" "}
           <Link href="/budgets" className="underline underline-offset-2">
-            Define um orçamento
+            Set a budget
           </Link>
         </p>
       )}
 
       {hasIncome && (
         <div className="mt-4 flex items-center justify-between border-t border-hairline pt-3 text-sm">
-          <span className="text-muted">Entradas</span>
+          <span className="text-muted">Income</span>
           <span
             className="font-mono tabular-nums"
             style={{ color: "var(--good)" }}

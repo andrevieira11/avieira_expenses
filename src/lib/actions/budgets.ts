@@ -12,7 +12,7 @@ const schema = z.object({
   categoryId: z.string().min(1).nullable(),
   amountCents: z.number().int().min(0).max(2_000_000_000),
   // Always the first of the month this budget takes effect.
-  effectiveFrom: z.string().regex(/^\d{4}-\d{2}-01$/, "Mês inválido"),
+  effectiveFrom: z.string().regex(/^\d{4}-\d{2}-01$/, "Invalid month"),
 });
 
 export type SetBudgetInput = z.infer<typeof schema>;
@@ -25,11 +25,11 @@ export type ActionResult = { ok: true } | { ok: false; error: string };
 export async function setBudget(input: SetBudgetInput): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     const data = schema.parse(input);
 
     if (data.scope === "category") {
-      if (!data.categoryId) return { ok: false, error: "Categoria em falta" };
+      if (!data.categoryId) return { ok: false, error: "Category is required" };
       const c = await db
         .select({ id: categories.id })
         .from(categories)
@@ -40,7 +40,7 @@ export async function setBudget(input: SetBudgetInput): Promise<ActionResult> {
           ),
         )
         .limit(1);
-      if (!c.length) return { ok: false, error: "Categoria inválida" };
+      if (!c.length) return { ok: false, error: "Invalid category" };
 
       await db
         .insert(budgets)
@@ -82,6 +82,6 @@ export async function setBudget(input: SetBudgetInput): Promise<ActionResult> {
     revalidatePath("/budgets");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }

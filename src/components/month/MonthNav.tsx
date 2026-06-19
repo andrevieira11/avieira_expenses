@@ -12,7 +12,7 @@ export function MonthNav({ year, month }: { year: number; month: number }) {
       <Link
         href={`/month?m=${prev}`}
         className="grid h-9 w-9 place-items-center rounded-full text-muted hover:bg-surface-2 hover:text-fg"
-        aria-label="Mês anterior"
+        aria-label="Previous month"
       >
         <ChevronLeft className="h-5 w-5" />
       </Link>
@@ -22,7 +22,7 @@ export function MonthNav({ year, month }: { year: number; month: number }) {
       <Link
         href={`/month?m=${next}`}
         className="grid h-9 w-9 place-items-center rounded-full text-muted hover:bg-surface-2 hover:text-fg"
-        aria-label="Mês seguinte"
+        aria-label="Next month"
       >
         <ChevronRight className="h-5 w-5" />
       </Link>

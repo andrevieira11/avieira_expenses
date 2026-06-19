@@ -7,7 +7,7 @@ export function YearNav({ year }: { year: number }) {
       <Link
         href={`/year?y=${year - 1}`}
         className="grid h-9 w-9 place-items-center rounded-full text-muted hover:bg-surface-2 hover:text-fg"
-        aria-label="Ano anterior"
+        aria-label="Previous year"
       >
         <ChevronLeft className="h-5 w-5" />
       </Link>
@@ -15,7 +15,7 @@ export function YearNav({ year }: { year: number }) {
       <Link
         href={`/year?y=${year + 1}`}
         className="grid h-9 w-9 place-items-center rounded-full text-muted hover:bg-surface-2 hover:text-fg"
-        aria-label="Ano seguinte"
+        aria-label="Next year"
       >
         <ChevronRight className="h-5 w-5" />
       </Link>

@@ -71,7 +71,7 @@ export function SubscriptionsManager({
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nome (ex: Netflix)"
+            placeholder="Name (e.g. Netflix)"
             maxLength={80}
             className="flex-1 rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm outline-none placeholder:text-muted focus:border-muted"
           />
@@ -89,10 +89,10 @@ export function SubscriptionsManager({
             onChange={(e) => setCadence(e.target.value as Cadence)}
             className="rounded-xl border border-hairline bg-bg px-3 py-2.5 text-sm outline-none focus:border-muted"
           >
-            <option value="weekly">Semanal</option>
-            <option value="monthly">Mensal</option>
-            <option value="quarterly">Trimestral</option>
-            <option value="yearly">Anual</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="yearly">Yearly</option>
           </select>
           <input
             type="date"
@@ -105,7 +105,7 @@ export function SubscriptionsManager({
             onChange={(e) => setCategoryId(e.target.value)}
             className="flex-1 rounded-xl border border-hairline bg-bg px-3 py-2.5 text-sm outline-none focus:border-muted"
           >
-            <option value="">Categoria…</option>
+            <option value="">Category…</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -118,14 +118,14 @@ export function SubscriptionsManager({
             className="flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
           >
             <Plus className="h-4 w-4" />
-            Criar
+            Create
           </button>
         </div>
       </div>
 
       {recurring.length > 0 && (
         <p className="px-1 text-sm text-muted">
-          Custo mensal estimado:{" "}
+          Estimated monthly cost:{" "}
           <span className="font-mono font-semibold text-fg tabular-nums">
             {formatMoney(monthlyTotal, currency)}
           </span>
@@ -135,9 +135,9 @@ export function SubscriptionsManager({
       {recurring.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-hairline py-14 text-center">
           <Repeat className="h-7 w-7 text-muted" />
-          <p className="mt-3 text-sm font-medium">Sem subscrições</p>
+          <p className="mt-3 text-sm font-medium">No subscriptions</p>
           <p className="mt-1 text-xs text-muted">
-            Adiciona as tuas despesas recorrentes.
+            Add your recurring expenses.
           </p>
         </div>
       ) : (
@@ -157,7 +157,7 @@ function RecurringRow({ r, currency }: { r: Recurring; currency: string }) {
   const d = daysUntil(r.nextDue);
   const color = r.categoryColor ? categoryColor(r.categoryColor) : null;
   const dueText =
-    d < 0 ? `Em atraso ${-d}d` : d === 0 ? "Vence hoje" : `Renova em ${d}d`;
+    d < 0 ? `Overdue ${-d}d` : d === 0 ? "Due today" : `Renews in ${d}d`;
   const dueColor =
     d <= 1 ? "var(--over)" : d <= 7 ? "var(--warn)" : "var(--muted)";
 
@@ -193,13 +193,13 @@ function RecurringRow({ r, currency }: { r: Recurring; currency: string }) {
         disabled={busy}
         className="rounded-xl bg-brand px-3 py-1.5 text-xs font-medium text-white transition hover:opacity-90 disabled:opacity-50"
       >
-        Pagar
+        Pay
       </button>
       <button
         onClick={remove}
         disabled={busy}
         className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted hover:text-over"
-        aria-label="Apagar"
+        aria-label="Delete"
       >
         <Trash2 className="h-4 w-4" />
       </button>

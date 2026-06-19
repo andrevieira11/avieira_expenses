@@ -49,7 +49,7 @@ export default async function HomePage() {
       <header>
         <p className="text-sm capitalize text-muted">{monthLabel(year, month)}</p>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Olá{firstName ? `, ${firstName}` : ""}
+          Hi{firstName ? `, ${firstName}` : ""}
         </h1>
       </header>
 
@@ -60,7 +60,7 @@ export default async function HomePage() {
         >
           <span className="flex items-center gap-2.5 text-sm font-medium">
             <Inbox className="h-4 w-4 text-brand" />
-            {pending} {pending === 1 ? "movimento" : "movimentos"} a aguardar categoria
+            {pending} {pending === 1 ? "transaction" : "transactions"} awaiting category
           </span>
           <ChevronRight className="h-4 w-4 text-muted" />
         </Link>
@@ -73,9 +73,9 @@ export default async function HomePage() {
           currency={currency}
         />
         <div className="grid w-full grid-cols-3 divide-x divide-hairline text-center">
-          <Stat label="Gasto" value={formatMoney(summary.spentCents, currency)} />
+          <Stat label="Spent" value={formatMoney(summary.spentCents, currency)} />
           <Stat
-            label="Orçamento"
+            label="Budget"
             value={
               budget.overallCents != null
                 ? formatMoney(budget.overallCents, currency)
@@ -83,23 +83,23 @@ export default async function HomePage() {
             }
           />
           <Stat
-            label="Poupado"
+            label="Saved"
             value={saved != null ? formatMoney(saved, currency) : "—"}
             tone={saved != null ? (saved >= 0 ? "good" : "over") : undefined}
           />
         </div>
         {safeToSpend != null && safeToSpend > 0 && (
           <p className="text-xs text-muted">
-            Podes gastar{" "}
+            You can spend{" "}
             <span className="font-semibold text-fg">
               {formatMoney(safeToSpend, currency)}
             </span>
-            /dia até ao fim do mês
+            /day until month end
           </p>
         )}
         {summary.incomeCents > 0 && (
           <p className="text-xs text-muted">
-            Entradas:{" "}
+            Income:{" "}
             <span className="font-semibold" style={{ color: "var(--good)" }}>
               +{formatMoney(summary.incomeCents, currency)}
             </span>
@@ -112,14 +112,14 @@ export default async function HomePage() {
           href="/budgets"
           className="block rounded-2xl border border-dashed border-hairline px-4 py-3 text-center text-sm text-muted transition hover:bg-surface-2"
         >
-          Define um orçamento para veres quanto podes gastar
+          Set a budget to see how much you can spend
         </Link>
       )}
 
       {catTotals.some((c) => c.netCents > 0) && (
         <section className="rounded-3xl border border-hairline bg-surface p-5">
           <h2 className="mb-4 text-sm font-medium text-muted">
-            Onde foi o dinheiro
+            Where the money went
           </h2>
           <CategoryDonut items={catTotals} currency={currency} />
         </section>
@@ -127,9 +127,9 @@ export default async function HomePage() {
 
       <section>
         <div className="mb-2 flex items-center justify-between px-1">
-          <h2 className="text-sm font-medium text-muted">Recentes</h2>
+          <h2 className="text-sm font-medium text-muted">Recent</h2>
           <Link href="/transactions" className="text-xs text-muted hover:text-fg">
-            Ver tudo
+            See all
           </Link>
         </div>
         {recent.length > 0 ? (
@@ -140,9 +140,9 @@ export default async function HomePage() {
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-hairline px-4 py-8 text-center text-sm text-muted">
-            Ainda sem movimentos.{" "}
+            No transactions yet.{" "}
             <Link href="/add" className="text-fg underline underline-offset-2">
-              Adiciona o primeiro
+              Add the first one
             </Link>
             .
           </div>

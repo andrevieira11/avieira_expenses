@@ -25,7 +25,7 @@ export async function createCategory(input: {
 }): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     const data = z.object({ name: nameSchema, color: colorEnum }).parse(input);
     const [agg] = await db
       .select({ m: max(categories.sortOrder) })
@@ -41,7 +41,7 @@ export async function createCategory(input: {
     revalidate();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
@@ -51,7 +51,7 @@ export async function updateCategory(
 ): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     const data = z.object({ name: nameSchema, color: colorEnum }).parse(input);
     await db
       .update(categories)
@@ -60,14 +60,14 @@ export async function updateCategory(
     revalidate();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
 export async function archiveCategory(id: string): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     await db
       .update(categories)
       .set({ isArchived: true })
@@ -75,7 +75,7 @@ export async function archiveCategory(id: string): Promise<ActionResult> {
     revalidate();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
@@ -85,7 +85,7 @@ export async function createSubcategory(
 ): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     const n = nameSchema.parse(name);
     const [cat] = await db
       .select({ id: categories.id })
@@ -94,7 +94,7 @@ export async function createSubcategory(
         and(eq(categories.id, categoryId), eq(categories.bookId, ctx.book.id)),
       )
       .limit(1);
-    if (!cat) return { ok: false, error: "Categoria inválida" };
+    if (!cat) return { ok: false, error: "Invalid category" };
     const [agg] = await db
       .select({ m: max(subcategories.sortOrder) })
       .from(subcategories)
@@ -109,14 +109,14 @@ export async function createSubcategory(
     revalidate();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
 export async function archiveSubcategory(id: string): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     await db
       .update(subcategories)
       .set({ isArchived: true })
@@ -126,6 +126,6 @@ export async function archiveSubcategory(id: string): Promise<ActionResult> {
     revalidate();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }

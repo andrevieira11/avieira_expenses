@@ -65,7 +65,7 @@ export function CategoryPicker({
               type="button"
               onClick={() => onChange({ categoryId: null, subcategoryId: null })}
               className="grid h-8 w-8 place-items-center rounded-full hover:bg-surface-2"
-              aria-label="Voltar às categorias"
+              aria-label="Back to categories"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>

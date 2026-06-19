@@ -1,6 +1,6 @@
 /**
  * Money helpers. The app stores integer cents everywhere; formatting happens ONLY here
- * at the UI edge. Default locale pt-PT, currency EUR.
+ * at the UI edge. Default locale en-IE, currency EUR.
  */
 
 const formatters = new Map<string, Intl.NumberFormat>();
@@ -8,7 +8,7 @@ const formatters = new Map<string, Intl.NumberFormat>();
 function fmt(currency: string): Intl.NumberFormat {
   let f = formatters.get(currency);
   if (!f) {
-    f = new Intl.NumberFormat("pt-PT", { style: "currency", currency });
+    f = new Intl.NumberFormat("en-IE", { style: "currency", currency });
     formatters.set(currency, f);
   }
   return f;

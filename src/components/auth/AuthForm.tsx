@@ -29,7 +29,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       : await signIn.email({ email, password });
 
     if (result.error) {
-      setError(result.error.message ?? "Algo correu mal. Tenta de novo.");
+      setError(result.error.message ?? "Something went wrong. Try again.");
       setPending(false);
       return;
     }
@@ -44,7 +44,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       <div className="mb-8 text-center">
         <div className="text-2xl font-semibold tracking-tight text-fg">Saldo</div>
         <p className="mt-1 text-sm text-muted">
-          {isSignup ? "Cria a tua conta" : "Bem-vindo de volta"}
+          {isSignup ? "Create your account" : "Welcome back"}
         </p>
       </div>
 
@@ -54,7 +54,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       >
         {isSignup && (
           <Field
-            label="Nome"
+            label="Name"
             type="text"
             value={name}
             onChange={setName}
@@ -71,7 +71,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           required
         />
         <Field
-          label="Palavra-passe"
+          label="Password"
           type="password"
           value={password}
           onChange={setPassword}
@@ -88,29 +88,29 @@ export function AuthForm({ mode }: { mode: Mode }) {
           className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-60"
         >
           {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-          {isSignup ? "Criar conta" : "Entrar"}
+          {isSignup ? "Sign up" : "Sign in"}
         </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-muted">
         {isSignup ? (
           <>
-            Já tens conta?{" "}
+            Already have an account?{" "}
             <Link
               href="/login"
               className="font-medium text-fg underline-offset-4 hover:underline"
             >
-              Entrar
+              Sign in
             </Link>
           </>
         ) : (
           <>
-            Ainda não tens conta?{" "}
+            No account yet?{" "}
             <Link
               href="/signup"
               className="font-medium text-fg underline-offset-4 hover:underline"
             >
-              Criar conta
+              Sign up
             </Link>
           </>
         )}

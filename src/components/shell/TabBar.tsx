@@ -17,7 +17,7 @@ export function TabBar({ pendingCount = 0 }: { pendingCount?: number }) {
 
       <Link
         href="/add"
-        aria-label="Adicionar despesa"
+        aria-label="Add expense"
         className="-mt-6 grid h-14 w-14 place-items-center rounded-full bg-brand text-white shadow-lg shadow-brand/30 ring-4 ring-bg transition active:scale-95"
       >
         <Plus className="h-7 w-7" />

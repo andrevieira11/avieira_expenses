@@ -12,7 +12,7 @@ export function TransactionRow({
 }) {
   const color = categoryColor(tx.categoryColor);
   const isCredit = (tx.amountCents ?? 0) < 0;
-  const title = tx.merchant || tx.subcategoryName || tx.categoryName || "Sem categoria";
+  const title = tx.merchant || tx.subcategoryName || tx.categoryName || "No category";
   const subtitle = [tx.categoryName, tx.subcategoryName, tx.note]
     .filter(Boolean)
     .join(" · ");

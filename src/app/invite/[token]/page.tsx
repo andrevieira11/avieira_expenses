@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "@/lib/auth-session";
 import { AcceptInvite } from "@/components/books/AcceptInvite";
 
-export const metadata = { title: "Convite" };
+export const metadata = { title: "Invite" };
 
 export default async function InvitePage({
   params,

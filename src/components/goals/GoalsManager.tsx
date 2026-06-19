@@ -41,7 +41,7 @@ export function GoalsManager({
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nome (ex: Viagem ao Japão)"
+            placeholder="Name (e.g. Trip to Japan)"
             maxLength={80}
             className="flex-1 rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm outline-none placeholder:text-muted focus:border-muted"
           />
@@ -49,7 +49,7 @@ export function GoalsManager({
             inputMode="decimal"
             value={target}
             onChange={(e) => setTarget(e.target.value)}
-            placeholder="Meta €"
+            placeholder="Target €"
             className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-right font-mono text-sm tabular-nums outline-none placeholder:text-muted focus:border-muted sm:w-32"
           />
           <button
@@ -58,7 +58,7 @@ export function GoalsManager({
             className="flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
           >
             <Plus className="h-4 w-4" />
-            Criar
+            Create
           </button>
         </div>
       </div>
@@ -66,9 +66,9 @@ export function GoalsManager({
       {goals.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-hairline py-14 text-center">
           <PiggyBank className="h-7 w-7 text-muted" />
-          <p className="mt-3 text-sm font-medium">Sem objetivos</p>
+          <p className="mt-3 text-sm font-medium">No goals</p>
           <p className="mt-1 text-xs text-muted">
-            Cria uma meta e vê a poupança crescer.
+            Create a target and watch your savings grow.
           </p>
         </div>
       ) : (
@@ -123,7 +123,7 @@ function GoalCard({
             <span className="font-mono tabular-nums">
               {formatMoney(goal.savedCents, currency)}
             </span>{" "}
-            de{" "}
+            of{" "}
             <span className="font-mono tabular-nums">
               {formatMoney(goal.targetCents, currency)}
             </span>
@@ -133,7 +133,7 @@ function GoalCard({
           onClick={remove}
           disabled={busy}
           className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted hover:bg-surface-2 hover:text-over"
-          aria-label="Apagar objetivo"
+          aria-label="Delete goal"
         >
           <Trash2 className="h-4 w-4" />
         </button>
@@ -163,14 +163,14 @@ function GoalCard({
           disabled={busy}
           className="rounded-xl bg-brand px-3 py-1.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
         >
-          Juntar
+          Add
         </button>
         <button
           onClick={() => contribute(-1)}
           disabled={busy}
           className="rounded-xl border border-hairline px-3 py-1.5 text-sm transition hover:bg-surface-2 disabled:opacity-50"
         >
-          Retirar
+          Withdraw
         </button>
       </div>
     </div>

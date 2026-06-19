@@ -46,7 +46,7 @@ export function AmountKeypad({
             whileTap={{ scale: 0.94 }}
             onClick={() => press(k)}
             className="grid h-14 place-items-center rounded-2xl bg-surface-2 text-xl font-medium text-fg transition hover:brightness-95 active:brightness-90"
-            aria-label={k === "del" ? "Apagar" : k}
+            aria-label={k === "del" ? "Delete" : k}
           >
             {k === "del" ? <Delete className="h-5 w-5" /> : k}
           </motion.button>

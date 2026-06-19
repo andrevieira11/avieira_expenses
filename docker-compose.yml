@@ -41,6 +41,8 @@ services:
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:admin@localhost}
+      GOCARDLESS_SECRET_ID: ${GOCARDLESS_SECRET_ID:-}
+      GOCARDLESS_SECRET_KEY: ${GOCARDLESS_SECRET_KEY:-}
     volumes:
       - uploads:/app/uploads
     depends_on:
@@ -63,6 +65,23 @@ services:
       start_period: 40s
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
+
+  # Pulls bank transactions into the inbox every 8h (GoCardless free tier allows
+  # ~4 transaction fetches/account/day; 8h = 3/day, leaving room for manual "Sync now").
+  # No-op unless GOCARDLESS_* secrets are set. Hits the same token-gated endpoint a cron would.
+  bank-cron:
+    image: alpine:3
+    restart: unless-stopped
+    environment:
+      INGEST_WEBHOOK_TOKEN: ${INGEST_WEBHOOK_TOKEN}
+    command: >
+      sh -c 'while true; do sleep 28800;
+      wget -q -O- --post-data="" --header="Authorization: Bearer $$INGEST_WEBHOOK_TOKEN"
+      http://app:3000/api/banking/sync || true; done'
+    depends_on:
+      app:
+        condition: service_started
+    networks: [internal]
 
   # Polls GHCR every 5 min; on a new :latest it pulls + recreates the app container
   # (which re-runs migrations on start). Only watches the labelled app.

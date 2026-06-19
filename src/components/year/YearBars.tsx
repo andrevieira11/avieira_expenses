@@ -14,7 +14,7 @@ export function YearBars({
 
   return (
     <section>
-      <h2 className="mb-3 text-sm font-medium text-muted">Por mês</h2>
+      <h2 className="mb-3 text-sm font-medium text-muted">By month</h2>
       <div className="flex items-end gap-1.5">
         {data.map((d) => {
           const h = Math.round((Math.max(0, d.netCents) / max) * CHART_H);

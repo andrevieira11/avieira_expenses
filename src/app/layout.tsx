@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: { default: "Saldo", template: "%s · Saldo" },
-  description: "As tuas despesas, sob controlo.",
+  description: "Your expenses, under control.",
   applicationName: "Saldo",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -40,7 +40,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="pt"
+      lang="en"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >

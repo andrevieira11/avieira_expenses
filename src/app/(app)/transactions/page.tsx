@@ -10,7 +10,7 @@ import { EditableTransactionList } from "@/components/expense/EditableTransactio
 import { SearchBar } from "@/components/transactions/SearchBar";
 import { PageHeader } from "@/components/ui/PageHeader";
 
-export const metadata = { title: "Movimentos" };
+export const metadata = { title: "Transactions" };
 
 export default async function TransactionsPage({
   searchParams,
@@ -32,8 +32,8 @@ export default async function TransactionsPage({
   return (
     <div className="space-y-5">
       <PageHeader
-        title="Movimentos"
-        subtitle="Toca para editar ou apagar."
+        title="Transactions"
+        subtitle="Tap to edit or delete."
         action={
           <a
             href="/api/export"
@@ -49,7 +49,7 @@ export default async function TransactionsPage({
         transactions={transactions}
         categories={categories}
         currency={ctx.book.currency}
-        emptyHint={q ? "Sem resultados para essa pesquisa." : undefined}
+        emptyHint={q ? "No results for that search." : undefined}
       />
     </div>
   );

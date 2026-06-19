@@ -19,11 +19,11 @@ export default async function InboxPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="A aguardar categoria"
+        title="Waiting for category"
         subtitle={
           pending.length
-            ? `${pending.length} por categorizar`
-            : "Tudo categorizado"
+            ? `${pending.length} to categorize`
+            : "All categorized"
         }
       />
       <PendingInbox

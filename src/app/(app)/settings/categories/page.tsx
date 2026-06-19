@@ -4,7 +4,7 @@ import { getBookCategories } from "@/lib/queries/categories";
 import { CategoriesManager } from "@/components/categories/CategoriesManager";
 import { PageHeader } from "@/components/ui/PageHeader";
 
-export const metadata = { title: "Categorias" };
+export const metadata = { title: "Categories" };
 
 export default async function CategoriesPage() {
   const ctx = await getActiveBook();
@@ -15,8 +15,8 @@ export default async function CategoriesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Categorias"
-        subtitle="Adiciona, renomeia ou arquiva categorias e subcategorias."
+        title="Categories"
+        subtitle="Add, rename or archive categories and subcategories."
       />
       <CategoriesManager categories={categories} />
     </div>

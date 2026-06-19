@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { pt } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 /**
  * Calendar-date helpers for Postgres DATE columns. Month boundaries are computed with
@@ -40,14 +40,14 @@ export function parseYearMonth(s: string): { year: number; month: number } {
   return { year: Number(y), month: Number(m) };
 }
 
-/** Localized month label, e.g. (2025, 11) -> "Novembro 2025". */
+/** Localized month label, e.g. (2025, 11) -> "November 2025". */
 export function monthLabel(year: number, month: number): string {
-  return format(new Date(year, month - 1, 1), "LLLL yyyy", { locale: pt });
+  return format(new Date(year, month - 1, 1), "LLLL yyyy", { locale: enUS });
 }
 
 /** Short localized month, e.g. "Nov". */
 export function monthShort(year: number, month: number): string {
-  return format(new Date(year, month - 1, 1), "LLL", { locale: pt });
+  return format(new Date(year, month - 1, 1), "LLL", { locale: enUS });
 }
 
 /** Shift a "YYYY-MM" string by N months. */
@@ -57,12 +57,12 @@ export function shiftMonth(ym: string, delta: number): string {
   return `${Math.floor(idx / 12)}-${pad((idx % 12) + 1)}`;
 }
 
-/** Friendly label for a "YYYY-MM-DD" day: "Hoje", "Ontem", else "19 de junho". */
+/** Friendly label for a "YYYY-MM-DD" day: "Today", else "19 Jun". */
 export function dayLabel(ymd: string): string {
-  if (ymd === todayYmd()) return "Hoje";
+  if (ymd === todayYmd()) return "Today";
   const { year, month } = parseYearMonth(ymd);
   const day = Number(ymd.slice(8, 10));
-  return format(new Date(year, month - 1, day), "d 'de' LLLL", { locale: pt });
+  return format(new Date(year, month - 1, day), "d MMM", { locale: enUS });
 }
 
 export type Cadence = "weekly" | "monthly" | "quarterly" | "yearly";
@@ -89,10 +89,10 @@ export function daysUntil(ymd: string): number {
 }
 
 const CADENCE_LABELS: Record<Cadence, string> = {
-  weekly: "semanal",
-  monthly: "mensal",
-  quarterly: "trimestral",
-  yearly: "anual",
+  weekly: "weekly",
+  monthly: "monthly",
+  quarterly: "quarterly",
+  yearly: "yearly",
 };
 export function cadenceLabel(c: Cadence): string {
   return CADENCE_LABELS[c];

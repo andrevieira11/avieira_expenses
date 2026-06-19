@@ -54,7 +54,7 @@ export function CategoriesManager({
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && add()}
-          placeholder="Nova categoria"
+          placeholder="New category"
           maxLength={40}
           className="flex-1 rounded-xl border border-hairline bg-bg px-3.5 py-2 text-sm outline-none placeholder:text-muted focus:border-muted"
         />
@@ -64,7 +64,7 @@ export function CategoriesManager({
           className="inline-flex items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
         >
           <Plus className="h-4 w-4" />
-          Criar
+          Create
         </button>
       </div>
 
@@ -125,7 +125,7 @@ function CategoryCard({ category }: { category: CategoryWithSubs }) {
         <button
           onClick={archive}
           className="grid h-8 w-8 place-items-center rounded-full text-muted hover:text-over"
-          aria-label="Arquivar categoria"
+          aria-label="Archive category"
         >
           <X className="h-4 w-4" />
         </button>
@@ -141,7 +141,7 @@ function CategoryCard({ category }: { category: CategoryWithSubs }) {
             <button
               onClick={() => removeSub(s.id)}
               className="grid h-5 w-5 place-items-center rounded-full text-muted hover:text-over"
-              aria-label="Remover"
+              aria-label="Remove"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -152,7 +152,7 @@ function CategoryCard({ category }: { category: CategoryWithSubs }) {
           onChange={(e) => setSubName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addSub()}
           onBlur={addSub}
-          placeholder="+ subcategoria"
+          placeholder="+ subcategory"
           maxLength={40}
           className="w-32 rounded-full border border-dashed border-hairline bg-transparent px-3 py-1 text-sm outline-none placeholder:text-muted focus:border-muted"
         />
@@ -174,7 +174,7 @@ function ColorSelect({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="appearance-none rounded-xl border border-hairline bg-bg py-2 pl-7 pr-6 text-sm outline-none focus:border-muted"
-        aria-label="Cor"
+        aria-label="Color"
       >
         {COLORS.map((c) => (
           <option key={c} value={c}>

@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Saldo",
     short_name: "Saldo",
-    description: "As tuas despesas, sob controlo.",
+    description: "Your expenses, under control.",
     start_url: "/",
     display: "standalone",
     background_color: "#fafaf8",

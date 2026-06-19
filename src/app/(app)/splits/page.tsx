@@ -5,7 +5,7 @@ import { getBookCategories } from "@/lib/queries/categories";
 import { SplitsManager } from "@/components/splits/SplitsManager";
 import { PageHeader } from "@/components/ui/PageHeader";
 
-export const metadata = { title: "Acertos" };
+export const metadata = { title: "Splits" };
 
 export default async function SplitsPage() {
   const ctx = await getActiveBook();
@@ -20,8 +20,8 @@ export default async function SplitsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Acertos"
-        subtitle="Divide despesas; quem paga entra como receita na categoria escolhida."
+        title="Splits"
+        subtitle="Split expenses; whoever pays is recorded as income in the chosen category."
       />
       <SplitsManager splits={splits} categories={cats} currency={ctx.book.currency} />
     </div>

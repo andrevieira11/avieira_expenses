@@ -90,8 +90,8 @@ export function PushToggle() {
   if (!supported || key === null)
     return (
       <p className="text-sm text-muted">
-        Notificações indisponíveis aqui. No iPhone, adiciona o Saldo ao ecrã
-        principal primeiro.
+        Notifications aren&apos;t available here. On iPhone, add Saldo to your
+        home screen first.
       </p>
     );
   if (key === undefined) return <div className="h-9" />;
@@ -105,14 +105,14 @@ export function PushToggle() {
             className="inline-flex items-center gap-2 rounded-xl border border-hairline px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2"
           >
             <BellOff className="h-4 w-4" />
-            Desativar
+            Disable
           </button>
           <button
             onClick={test}
             className="inline-flex items-center gap-2 rounded-xl border border-hairline px-3.5 py-2 text-sm transition hover:bg-surface-2"
           >
             <Send className="h-4 w-4" />
-            Testar
+            Test
           </button>
         </>
       ) : (
@@ -126,7 +126,7 @@ export function PushToggle() {
           ) : (
             <Bell className="h-4 w-4" />
           )}
-          Ativar notificações
+          Enable notifications
         </button>
       )}
     </div>

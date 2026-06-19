@@ -4,7 +4,7 @@ import { getGoals } from "@/lib/queries/goals";
 import { GoalsManager } from "@/components/goals/GoalsManager";
 import { PageHeader } from "@/components/ui/PageHeader";
 
-export const metadata = { title: "Objetivos" };
+export const metadata = { title: "Goals" };
 
 export default async function GoalsPage() {
   const ctx = await getActiveBook();
@@ -15,8 +15,8 @@ export default async function GoalsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Objetivos de poupança"
-        subtitle="Define metas e acompanha o progresso."
+        title="Savings goals"
+        subtitle="Set targets and track your progress."
       />
       <GoalsManager goals={goals} currency={ctx.book.currency} />
     </div>

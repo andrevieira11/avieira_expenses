@@ -12,7 +12,7 @@ export async function POST() {
 
   await sendPushToUser(session.user.id, {
     title: "Saldo",
-    body: "Notificações ativas ✓",
+    body: "Notifications on ✓",
     url: "/",
   });
   return NextResponse.json({ ok: true });

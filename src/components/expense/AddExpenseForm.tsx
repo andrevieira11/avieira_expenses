@@ -68,10 +68,10 @@ export function AddExpenseForm({
               )}
             >
               {t === "expense"
-                ? "Despesa"
+                ? "Expense"
                 : t === "income"
-                  ? "Receita"
-                  : "Reembolso"}
+                  ? "Income"
+                  : "Refund"}
             </button>
           ))}
         </div>
@@ -80,13 +80,13 @@ export function AddExpenseForm({
       <AmountKeypad cents={cents} onChange={setCents} currency={currency} />
 
       <section>
-        <h2 className="mb-3 text-sm font-medium text-muted">Categoria</h2>
+        <h2 className="mb-3 text-sm font-medium text-muted">Category</h2>
         <CategoryPicker categories={categories} value={sel} onChange={setSel} />
       </section>
 
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <label className="text-sm font-medium text-muted">Data</label>
+          <label className="text-sm font-medium text-muted">Date</label>
           <input
             type="date"
             value={txDate}
@@ -99,7 +99,7 @@ export function AddExpenseForm({
           type="text"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Nota (opcional)"
+          placeholder="Note (optional)"
           maxLength={500}
           className="w-full rounded-xl border border-hairline bg-surface px-3.5 py-2.5 text-sm outline-none placeholder:text-muted focus:border-muted"
         />
@@ -115,7 +115,7 @@ export function AddExpenseForm({
           className="mx-auto flex w-full max-w-md items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40"
         >
           {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-          Guardar
+          Save
         </button>
       </div>
     </div>

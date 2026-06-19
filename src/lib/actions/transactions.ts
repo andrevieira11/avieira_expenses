@@ -16,7 +16,7 @@ const upsertSchema = z.object({
   // Positive magnitude in cents; the server applies the sign from `type`.
   amountCents: z.number().int().min(1).max(2_000_000_000),
   type: z.enum(["expense", "income", "refund"]),
-  txDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida"),
+  txDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date"),
   categoryId: z.string().min(1).nullable(),
   subcategoryId: z.string().min(1).nullable(),
   merchant: z.string().trim().max(120).nullish(),
@@ -43,7 +43,7 @@ async function assertCategoryInBook(
       .from(categories)
       .where(and(eq(categories.id, categoryId), eq(categories.bookId, bookId)))
       .limit(1);
-    if (!c.length) throw new Error("Categoria inválida");
+    if (!c.length) throw new Error("Invalid category");
   }
   if (subcategoryId) {
     const s = await db
@@ -53,9 +53,9 @@ async function assertCategoryInBook(
         and(eq(subcategories.id, subcategoryId), eq(subcategories.bookId, bookId)),
       )
       .limit(1);
-    if (!s.length) throw new Error("Subcategoria inválida");
+    if (!s.length) throw new Error("Invalid subcategory");
     if (categoryId && s[0].categoryId !== categoryId) {
-      throw new Error("Subcategoria não pertence à categoria");
+      throw new Error("Subcategory does not belong to the category");
     }
   }
 }
@@ -72,7 +72,7 @@ export async function createTransaction(
 ): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
 
     const data = upsertSchema.parse(input);
     await assertCategoryInBook(ctx.book.id, data.categoryId, data.subcategoryId);
@@ -97,7 +97,7 @@ export async function createTransaction(
     revalidate();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
@@ -116,8 +116,8 @@ async function maybeBudgetAlert(
     const before = after - signedAmount(data.type, data.amountCents);
     if (before <= budget.overallCents && after > budget.overallCents) {
       await sendPushToUser(userId, {
-        title: "Orçamento ultrapassado",
-        body: `Já gastaste ${(after / 100).toLocaleString("pt-PT")} € este mês.`,
+        title: "Budget exceeded",
+        body: `You've spent ${(after / 100).toLocaleString("en-IE")} € this month.`,
         url: "/",
       });
     }
@@ -132,7 +132,7 @@ export async function updateTransaction(
 ): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
 
     const data = upsertSchema.parse(input);
     await assertCategoryInBook(ctx.book.id, data.categoryId, data.subcategoryId);
@@ -159,7 +159,7 @@ export async function updateTransaction(
         merchant: transactions.merchant,
       });
 
-    if (!result.length) return { ok: false, error: "Movimento não encontrado" };
+    if (!result.length) return { ok: false, error: "Transaction not found" };
 
     // Merchant memory: teach this merchant / external-id -> category for next time.
     if (data.categoryId) {
@@ -174,25 +174,25 @@ export async function updateTransaction(
     revalidate();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
 export async function deleteTransaction(id: string): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
 
     const result = await db
       .delete(transactions)
       .where(and(eq(transactions.id, id), eq(transactions.bookId, ctx.book.id)))
       .returning({ id: transactions.id });
 
-    if (!result.length) return { ok: false, error: "Movimento não encontrado" };
+    if (!result.length) return { ok: false, error: "Transaction not found" };
 
     revalidate();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }

@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       .limit(1);
     if (!c)
       return NextResponse.json(
-        { error: `categoria "${d.category}" não encontrada` },
+        { error: `category "${d.category}" not found` },
         { status: 400 },
       );
     categoryId = c.id;

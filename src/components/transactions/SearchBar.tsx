@@ -25,7 +25,7 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Procurar por comerciante, nota, categoria…"
+        placeholder="Search by merchant, note, category…"
         className="w-full rounded-2xl border border-hairline bg-surface py-2.5 pl-10 pr-10 text-sm outline-none placeholder:text-muted focus:border-muted"
       />
       {q && (
@@ -33,7 +33,7 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
           type="button"
           onClick={clear}
           className="absolute right-3 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-surface-2"
-          aria-label="Limpar"
+          aria-label="Clear"
         >
           <X className="h-4 w-4" />
         </button>

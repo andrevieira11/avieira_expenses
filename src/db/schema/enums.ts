@@ -12,7 +12,12 @@ export const inviteStatusEnum = pgEnum("invite_status", [
 
 /** Money semantics. Sign carries the math (expense > 0, refund/income < 0); type carries meaning. */
 export const txTypeEnum = pgEnum("tx_type", ["expense", "income", "refund"]);
-export const txSourceEnum = pgEnum("tx_source", ["manual", "moey", "import"]);
+export const txSourceEnum = pgEnum("tx_source", [
+  "manual",
+  "moey",
+  "import",
+  "bank",
+]);
 export const txStatusEnum = pgEnum("tx_status", ["confirmed", "pending_category"]);
 
 /** Budgets are effective-dated; scope is the overall monthly budget or a per-category one. */

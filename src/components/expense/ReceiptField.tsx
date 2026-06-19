@@ -34,7 +34,7 @@ export function ReceiptField({ txId }: { txId: string }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
-            alt="Recibo"
+            alt="Receipt"
             onError={() => setHasReceipt(false)}
             className="max-h-40 rounded-xl border border-hairline object-contain"
           />
@@ -51,7 +51,7 @@ export function ReceiptField({ txId }: { txId: string }) {
         ) : (
           <Paperclip className="h-4 w-4" />
         )}
-        {hasReceipt ? "Mudar recibo" : "Anexar recibo"}
+        {hasReceipt ? "Change receipt" : "Attach receipt"}
       </button>
       <input
         ref={inputRef}

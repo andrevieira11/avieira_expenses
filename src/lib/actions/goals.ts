@@ -19,7 +19,7 @@ export async function createGoal(
 ): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     const data = createSchema.parse(input);
     await db.insert(savingsGoals).values({
       bookId: ctx.book.id,
@@ -29,7 +29,7 @@ export async function createGoal(
     revalidatePath("/goals");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
@@ -39,7 +39,7 @@ export async function contributeGoal(
 ): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     const delta = z.number().int().parse(deltaCents);
     await db
       .update(savingsGoals)
@@ -52,14 +52,14 @@ export async function contributeGoal(
     revalidatePath("/goals");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
 export async function deleteGoal(id: string): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     await db
       .delete(savingsGoals)
       .where(
@@ -68,6 +68,6 @@ export async function deleteGoal(id: string): Promise<ActionResult> {
     revalidatePath("/goals");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }

@@ -95,11 +95,11 @@ export function EditExpenseSheet({
         className="pb-safe relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-hairline bg-bg p-5 md:rounded-3xl"
       >
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-semibold">Editar movimento</h2>
+          <h2 className="text-base font-semibold">Edit transaction</h2>
           <button
             onClick={onClose}
             className="grid h-8 w-8 place-items-center rounded-full hover:bg-surface-2"
-            aria-label="Fechar"
+            aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>
@@ -118,10 +118,10 @@ export function EditExpenseSheet({
                 )}
               >
                 {t === "expense"
-                  ? "Despesa"
+                  ? "Expense"
                   : t === "income"
-                    ? "Receita"
-                    : "Reembolso"}
+                    ? "Income"
+                    : "Refund"}
               </button>
             ))}
           </div>
@@ -130,13 +130,13 @@ export function EditExpenseSheet({
         <AmountKeypad cents={cents} onChange={setCents} currency={currency} />
 
         <div className="mt-5">
-          <h3 className="mb-3 text-sm font-medium text-muted">Categoria</h3>
+          <h3 className="mb-3 text-sm font-medium text-muted">Category</h3>
           <CategoryPicker categories={categories} value={sel} onChange={setSel} />
         </div>
 
         <div className="mt-5 space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <label className="text-sm font-medium text-muted">Data</label>
+            <label className="text-sm font-medium text-muted">Date</label>
             <input
               type="date"
               value={txDate}
@@ -149,14 +149,14 @@ export function EditExpenseSheet({
             type="text"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Nota (opcional)"
+            placeholder="Note (optional)"
             maxLength={500}
             className="w-full rounded-xl border border-hairline bg-surface px-3.5 py-2.5 text-sm outline-none placeholder:text-muted focus:border-muted"
           />
         </div>
 
         <div className="mt-5">
-          <h3 className="mb-2 text-sm font-medium text-muted">Recibo</h3>
+          <h3 className="mb-2 text-sm font-medium text-muted">Receipt</h3>
           <ReceiptField txId={tx.id} />
         </div>
 
@@ -175,7 +175,7 @@ export function EditExpenseSheet({
             )}
           >
             <Trash2 className="h-4 w-4" />
-            {confirmDelete ? "Confirmar" : ""}
+            {confirmDelete ? "Confirm" : ""}
           </button>
           <button
             type="button"
@@ -184,7 +184,7 @@ export function EditExpenseSheet({
             className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40"
           >
             {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-            Guardar
+            Save
           </button>
         </div>
       </motion.div>

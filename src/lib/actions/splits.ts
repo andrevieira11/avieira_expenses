@@ -30,7 +30,7 @@ export async function createSplit(
 ): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     const data = createSchema.parse(input);
     const total = data.participants.reduce((s, p) => s + p.shareCents, 0);
 
@@ -57,7 +57,7 @@ export async function createSplit(
     revalidatePath("/splits");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
@@ -67,7 +67,7 @@ export async function markParticipantPaid(
 ): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
 
     const [row] = await db
       .select({
@@ -85,7 +85,7 @@ export async function markParticipantPaid(
       .where(eq(splitParticipants.id, participantId))
       .limit(1);
     if (!row || row.bookId !== ctx.book.id)
-      return { ok: false, error: "Não encontrado" };
+      return { ok: false, error: "Not found" };
     if (row.paid) return { ok: true };
 
     const [tx] = await db
@@ -101,7 +101,7 @@ export async function markParticipantPaid(
         categoryId: row.categoryId,
         subcategoryId: row.subcategoryId,
         merchant: row.name,
-        note: `Acerto: ${row.title}`,
+        note: `Settlement: ${row.title}`,
         createdBy: ctx.user.id,
       })
       .returning({ id: transactions.id });
@@ -116,7 +116,7 @@ export async function markParticipantPaid(
     revalidatePath("/month");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
@@ -125,7 +125,7 @@ export async function markParticipantUnpaid(
 ): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
 
     const [row] = await db
       .select({
@@ -137,7 +137,7 @@ export async function markParticipantUnpaid(
       .where(eq(splitParticipants.id, participantId))
       .limit(1);
     if (!row || row.bookId !== ctx.book.id)
-      return { ok: false, error: "Não encontrado" };
+      return { ok: false, error: "Not found" };
 
     if (row.txId) {
       await db
@@ -159,14 +159,14 @@ export async function markParticipantUnpaid(
     revalidatePath("/month");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
 export async function deleteSplit(id: string): Promise<ActionResult> {
   try {
     const ctx = await getActiveBook();
-    if (!ctx) return { ok: false, error: "Sessão expirada" };
+    if (!ctx) return { ok: false, error: "Session expired" };
     // Participants cascade; any income already recorded stays (real money received).
     await db
       .delete(splits)
@@ -174,6 +174,6 @@ export async function deleteSplit(id: string): Promise<ActionResult> {
     revalidatePath("/splits");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }

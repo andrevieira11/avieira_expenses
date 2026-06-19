@@ -35,7 +35,7 @@ export async function createBook(input: {
 }): Promise<Result<{ id: string }>> {
   try {
     const session = await getServerSession();
-    if (!session) return { ok: false, error: "Sessão expirada" };
+    if (!session) return { ok: false, error: "Session expired" };
     const data = z
       .object({
         name: z.string().trim().min(1).max(60),
@@ -57,7 +57,7 @@ export async function createBook(input: {
     revalidatePath("/", "layout");
     return { ok: true, id };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
@@ -67,9 +67,9 @@ export async function createInvite(
 ): Promise<Result<{ token: string }>> {
   try {
     const session = await getServerSession();
-    if (!session) return { ok: false, error: "Sessão expirada" };
+    if (!session) return { ok: false, error: "Session expired" };
     if ((await roleIn(bookId, session.user.id)) !== "owner")
-      return { ok: false, error: "Apenas o dono pode convidar" };
+      return { ok: false, error: "Only the owner can invite" };
 
     const token = createId() + createId();
     await db.insert(bookInvites).values({
@@ -82,7 +82,7 @@ export async function createInvite(
     });
     return { ok: true, token };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
@@ -91,16 +91,16 @@ export async function acceptInvite(
 ): Promise<Result<{ bookId: string }>> {
   try {
     const session = await getServerSession();
-    if (!session) return { ok: false, error: "Inicia sessão para aceitar" };
+    if (!session) return { ok: false, error: "Sign in to accept" };
 
     const [inv] = await db
       .select()
       .from(bookInvites)
       .where(and(eq(bookInvites.token, token), eq(bookInvites.status, "pending")))
       .limit(1);
-    if (!inv) return { ok: false, error: "Convite inválido ou já usado" };
+    if (!inv) return { ok: false, error: "Invalid or already used invite" };
     if (new Date(inv.expiresAt) < new Date())
-      return { ok: false, error: "Convite expirado" };
+      return { ok: false, error: "Invite expired" };
 
     await db
       .insert(bookMembers)
@@ -115,21 +115,21 @@ export async function acceptInvite(
     revalidatePath("/", "layout");
     return { ok: true, bookId: inv.bookId };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
 export async function leaveBook(bookId: string): Promise<Result> {
   try {
     const session = await getServerSession();
-    if (!session) return { ok: false, error: "Sessão expirada" };
+    if (!session) return { ok: false, error: "Session expired" };
     const [b] = await db
       .select({ ownerId: books.ownerId })
       .from(books)
       .where(eq(books.id, bookId))
       .limit(1);
     if (b?.ownerId === session.user.id)
-      return { ok: false, error: "O dono não pode sair do livro" };
+      return { ok: false, error: "The owner cannot leave the book" };
 
     await db
       .delete(bookMembers)
@@ -143,7 +143,7 @@ export async function leaveBook(bookId: string): Promise<Result> {
     revalidatePath("/", "layout");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }
 
@@ -153,16 +153,16 @@ export async function removeMember(
 ): Promise<Result> {
   try {
     const session = await getServerSession();
-    if (!session) return { ok: false, error: "Sessão expirada" };
+    if (!session) return { ok: false, error: "Session expired" };
     if ((await roleIn(bookId, session.user.id)) !== "owner")
-      return { ok: false, error: "Apenas o dono pode remover" };
+      return { ok: false, error: "Only the owner can remove" };
     const [b] = await db
       .select({ ownerId: books.ownerId })
       .from(books)
       .where(eq(books.id, bookId))
       .limit(1);
     if (b?.ownerId === userId)
-      return { ok: false, error: "Não podes remover o dono" };
+      return { ok: false, error: "You can't remove the owner" };
 
     await db
       .delete(bookMembers)
@@ -170,6 +170,6 @@ export async function removeMember(
     revalidatePath("/settings/books");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erro" };
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
   }
 }

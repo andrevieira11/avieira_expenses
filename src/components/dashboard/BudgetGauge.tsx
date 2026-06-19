@@ -31,9 +31,9 @@ export function BudgetGauge({
   const centerCents = hasBudget ? Math.abs(remaining!) : spentCents;
   const centerLabel = hasBudget
     ? remaining! >= 0
-      ? "Disponível"
-      : "Acima"
-    : "Gasto";
+      ? "Available"
+      : "Over"
+    : "Spent";
 
   return (
     <div className="relative grid place-items-center">
@@ -74,7 +74,7 @@ export function BudgetGauge({
         </p>
         {hasBudget && (
           <p className="mt-0.5 text-xs text-muted">
-            de {(budgetCents! / 100).toLocaleString("pt-PT")} €
+            of {(budgetCents! / 100).toLocaleString("en-IE")} €
           </p>
         )}
       </div>

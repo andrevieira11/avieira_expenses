@@ -23,7 +23,7 @@ export function Sidebar({ pendingCount = 0 }: { pendingCount?: number }) {
         className="mb-3 flex items-center gap-2 rounded-2xl bg-brand px-3 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
       >
         <Plus className="h-4 w-4" />
-        Adicionar
+        Add
       </Link>
 
       <nav className="flex flex-col gap-0.5">

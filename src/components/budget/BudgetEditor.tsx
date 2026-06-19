@@ -28,7 +28,7 @@ export function BudgetEditor({
     <div className="space-y-6">
       <div className="rounded-3xl border border-hairline bg-surface px-2">
         <BudgetRow
-          label="Orçamento total"
+          label="Total budget"
           scope="overall"
           categoryId={null}
           monthStart={monthStart}
@@ -39,7 +39,7 @@ export function BudgetEditor({
 
       <div>
         <h2 className="mb-2 px-1 text-sm font-medium text-muted">
-          Por categoria (opcional)
+          Per category (optional)
         </h2>
         <div className="divide-y divide-hairline rounded-3xl border border-hairline bg-surface px-2">
           {categories.map((c) => (

@@ -59,7 +59,7 @@ export function SplitsManager({
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Título (ex: Jantar de equipa)"
+          placeholder="Title (e.g. Team dinner)"
           maxLength={80}
           className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm outline-none placeholder:text-muted focus:border-muted"
         />
@@ -68,7 +68,7 @@ export function SplitsManager({
           onChange={(e) => setCategoryId(e.target.value)}
           className="w-full rounded-xl border border-hairline bg-bg px-3 py-2.5 text-sm outline-none focus:border-muted"
         >
-          <option value="">Categoria da receita (opcional)</option>
+          <option value="">Income category (optional)</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -80,7 +80,7 @@ export function SplitsManager({
             <input
               value={r.name}
               onChange={(e) => setRow(i, "name", e.target.value)}
-              placeholder="Nome"
+              placeholder="Name"
               maxLength={60}
               className="flex-1 rounded-xl border border-hairline bg-bg px-3.5 py-2 text-sm outline-none placeholder:text-muted focus:border-muted"
             />
@@ -95,7 +95,7 @@ export function SplitsManager({
               <button
                 onClick={() => setRows((rs) => rs.filter((_, idx) => idx !== i))}
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-muted hover:text-over"
-                aria-label="Remover"
+                aria-label="Remove"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -107,7 +107,7 @@ export function SplitsManager({
             onClick={() => setRows((rs) => [...rs, { name: "", amount: "" }])}
             className="text-sm font-medium text-muted hover:text-fg"
           >
-            + pessoa
+            + person
           </button>
           <button
             onClick={create}
@@ -115,7 +115,7 @@ export function SplitsManager({
             className="inline-flex items-center gap-2 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
           >
             <Plus className="h-4 w-4" />
-            Criar acerto
+            Create split
           </button>
         </div>
       </div>
@@ -123,9 +123,9 @@ export function SplitsManager({
       {splits.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-hairline py-14 text-center">
           <HandCoins className="h-7 w-7 text-muted" />
-          <p className="mt-3 text-sm font-medium">Sem acertos</p>
+          <p className="mt-3 text-sm font-medium">No splits</p>
           <p className="mt-1 text-xs text-muted">
-            Divide uma despesa e acompanha quem já pagou.
+            Split an expense and track who has paid.
           </p>
         </div>
       ) : (
@@ -170,10 +170,10 @@ function SplitCard({
             Total {formatMoney(split.totalCents, currency)} ·{" "}
             {remaining > 0 ? (
               <span style={{ color: "var(--over)" }}>
-                falta {formatMoney(remaining, currency)}
+                {formatMoney(remaining, currency)} left
               </span>
             ) : (
-              <span style={{ color: "var(--good)" }}>tudo pago</span>
+              <span style={{ color: "var(--good)" }}>all paid</span>
             )}
           </p>
         </div>
@@ -181,7 +181,7 @@ function SplitCard({
           onClick={remove}
           disabled={busy}
           className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted hover:text-over"
-          aria-label="Apagar"
+          aria-label="Delete"
         >
           <Trash2 className="h-4 w-4" />
         </button>
@@ -210,10 +210,10 @@ function SplitCard({
                 {p.paid ? (
                   <>
                     <Check className="h-3 w-3" />
-                    Pago
+                    Paid
                   </>
                 ) : (
-                  "Marcar pago"
+                  "Mark paid"
                 )}
               </button>
             </div>

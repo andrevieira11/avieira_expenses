@@ -21,7 +21,7 @@ export function PlafondView({
 
   return (
     <section>
-      <h2 className="mb-3 text-sm font-medium text-muted">Plafond este mês</h2>
+      <h2 className="mb-3 text-sm font-medium text-muted">This month&apos;s allowance</h2>
       <div className="space-y-4 rounded-3xl border border-hairline bg-surface p-5">
         {overall && <PlafondBar row={overall} currency={currency} bold />}
         {categories.map((r, i) => (
@@ -63,8 +63,8 @@ function PlafondBar({
           style={{ color: remaining >= 0 ? "var(--muted)" : "var(--over)" }}
         >
           {remaining >= 0
-            ? `Resta ${formatMoney(remaining, currency)}`
-            : `Excedido ${formatMoney(-remaining, currency)}`}
+            ? `Left ${formatMoney(remaining, currency)}`
+            : `Over ${formatMoney(-remaining, currency)}`}
         </span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-surface-2">

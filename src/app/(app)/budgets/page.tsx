@@ -11,7 +11,7 @@ import { BudgetEditor } from "@/components/budget/BudgetEditor";
 import { PlafondView } from "@/components/budget/PlafondView";
 import { PageHeader } from "@/components/ui/PageHeader";
 
-export const metadata = { title: "Orçamentos" };
+export const metadata = { title: "Budgets" };
 
 export default async function BudgetsPage() {
   const ctx = await getActiveBook();
@@ -61,8 +61,8 @@ export default async function BudgetsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Orçamentos"
-        subtitle={`Em vigor a partir de ${monthLabel(year, month)} (e meses futuros)`}
+        title="Budgets"
+        subtitle={`In effect from ${monthLabel(year, month)} (and future months)`}
       />
       <PlafondView
         overall={overall}

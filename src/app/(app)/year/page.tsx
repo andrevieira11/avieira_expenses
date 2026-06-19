@@ -12,7 +12,7 @@ import { MonthlyComparisonChart } from "@/components/year/MonthlyComparisonChart
 import { YearNav } from "@/components/year/YearNav";
 import { formatMoney } from "@/lib/money";
 
-export const metadata = { title: "Ano" };
+export const metadata = { title: "Year" };
 
 export default async function YearPage({
   searchParams,
@@ -40,13 +40,13 @@ export default async function YearPage({
     <div className="space-y-6">
       <YearNav year={year} />
       <div className="rounded-3xl border border-hairline bg-surface p-5">
-        <p className="text-sm text-muted">Total gasto em {year}</p>
+        <p className="text-sm text-muted">Total spent in {year}</p>
         <p className="mt-1 font-mono text-3xl font-semibold tabular-nums">
           {formatMoney(total, ctx.book.currency)}
         </p>
         <p className="mt-1 text-xs text-muted">
-          média {formatMoney(Math.round(total / activeMonths), ctx.book.currency)}
-          /mês
+          average {formatMoney(Math.round(total / activeMonths), ctx.book.currency)}
+          /mo
         </p>
       </div>
       <YearBars year={year} data={monthly} />
