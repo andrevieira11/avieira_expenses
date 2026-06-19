@@ -44,6 +44,9 @@ export const bankAccounts = pgTable(
       .references(() => bankConnections.id, { onDelete: "cascade" }),
     accountId: text("account_id").notNull().unique(),
     name: text("name"),
+    // Only import transactions on/after this instant — defaults to link time so a
+    // newly connected account brings NO history backfill, just new spends going forward.
+    syncFrom: timestamp("sync_from").defaultNow().notNull(),
     lastSyncedAt: timestamp("last_synced_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },

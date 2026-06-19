@@ -33,8 +33,11 @@ export async function syncBook(
   let imported = 0;
 
   for (const acc of accounts) {
-    // First sync pulls ~89 days; later syncs re-pull a small overlap (dedup handles repeats).
-    const from = acc.lastSyncedAt ? daysAgo(7) : daysAgo(89);
+    // Floor at link time so a freshly connected account brings NO history backfill —
+    // only spends from when you connected it. Later syncs re-pull a 7d overlap (dedup handles it).
+    const floor = acc.syncFrom.toISOString().slice(0, 10);
+    const overlap = acc.lastSyncedAt ? daysAgo(7) : floor;
+    const from = overlap > floor ? overlap : floor;
 
     let fetched: EbTransaction[] = [];
     try {

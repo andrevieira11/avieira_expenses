@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Inbox, CircleCheck } from "lucide-react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Inbox, CircleCheck, Trash2, Loader2 } from "lucide-react";
 import { EditExpenseSheet } from "@/components/expense/EditExpenseSheet";
+import { clearInbox } from "@/lib/actions/inbox";
 import { formatFlow } from "@/lib/money";
 import { categoryColor } from "@/lib/colors";
 import type { MonthTransaction } from "@/lib/queries/transactions";
@@ -17,7 +19,9 @@ export function PendingInbox({
   categories: CategoryWithSubs[];
   currency: string;
 }) {
+  const router = useRouter();
   const [editing, setEditing] = useState<MonthTransaction | null>(null);
+  const [clearing, startClear] = useTransition();
 
   if (pending.length === 0) {
     return (
@@ -33,6 +37,32 @@ export function PendingInbox({
 
   return (
     <>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          disabled={clearing}
+          onClick={() => {
+            if (
+              !confirm(
+                "Remove all pending transactions? They won't be re-imported — you'll only get new spends from now on.",
+              )
+            )
+              return;
+            startClear(async () => {
+              await clearInbox();
+              router.refresh();
+            });
+          }}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-hairline px-3 py-1.5 text-xs font-medium text-muted transition hover:text-over disabled:opacity-50"
+        >
+          {clearing ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Trash2 className="h-3.5 w-3.5" />
+          )}
+          Clear all
+        </button>
+      </div>
       <div className="space-y-2">
         {pending.map((tx) => {
           const color = tx.categoryColor ? categoryColor(tx.categoryColor) : null;

@@ -1,0 +1,1 @@
+ALTER TABLE "bank_accounts" ADD COLUMN "sync_from" timestamp DEFAULT now() NOT NULL;
