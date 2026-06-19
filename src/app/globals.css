@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+/* Class-based dark mode (next-themes toggles `.dark` on <html>). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Design tokens. Chrome is quiet neutral so the 5 category hues read as data.
+ * Each category has a base (fills/dots) and a -soft (chip bg / heatmap low intensity).
+ * Budget health: good -> warn -> over (rose reserved for over-budget / destructive).
+ */
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --surface-2: #f4f3f0;
+  --hairline: #eceae6;
+  --fg: #1c1b19;
+  --muted: #6b6862;
+
+  --cat-amber: #c98a1a;
+  --cat-amber-soft: #f6e8cc;
+  --cat-green: #3f8f5b;
+  --cat-green-soft: #d8ebdd;
+  --cat-orange: #d2733c;
+  --cat-orange-soft: #f7e2d2;
+  --cat-blue: #3e6db0;
+  --cat-blue-soft: #d8e2f2;
+  --cat-slate: #5e6b7a;
+  --cat-slate-soft: #dee3e9;
+
+  --good: #3f8f5b;
+  --warn: #c98a1a;
+  --over: #c2455b;
+
+  --brand: #137a5f;
+}
+
+.dark {
+  --bg: #0e0f11;
+  --surface: #16181b;
+  --surface-2: #1d2024;
+  --hairline: #24272b;
+  --fg: #eceaea;
+  --muted: #9a9c9e;
+
+  --cat-amber: #e0a53e;
+  --cat-amber-soft: #3a2e18;
+  --cat-green: #5bb87b;
+  --cat-green-soft: #16301f;
+  --cat-orange: #e8915c;
+  --cat-orange-soft: #3a2418;
+  --cat-blue: #5e92d6;
+  --cat-blue-soft: #16263f;
+  --cat-slate: #8a98a8;
+  --cat-slate-soft: #222a33;
+
+  --good: #5bb87b;
+  --warn: #e0a53e;
+  --over: #d86b7e;
+
+  --brand: #1c9a78;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-hairline: var(--hairline);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+
+  --color-cat-amber: var(--cat-amber);
+  --color-cat-amber-soft: var(--cat-amber-soft);
+  --color-cat-green: var(--cat-green);
+  --color-cat-green-soft: var(--cat-green-soft);
+  --color-cat-orange: var(--cat-orange);
+  --color-cat-orange-soft: var(--cat-orange-soft);
+  --color-cat-blue: var(--cat-blue);
+  --color-cat-blue-soft: var(--cat-blue-soft);
+  --color-cat-slate: var(--cat-slate);
+  --color-cat-slate-soft: var(--cat-slate-soft);
+
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --color-over: var(--over);
+  --color-brand: var(--brand);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: var(--hairline);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Respect the iOS notch / home indicator for bottom-fixed UI. */
+@utility pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+}
+@utility pt-safe {
+  padding-top: max(env(safe-area-inset-top), 0px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

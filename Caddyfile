@@ -1,0 +1,26 @@
+# Add this site block to your EXISTING Caddy. Caddy auto-issues HTTPS and sets the
+# X-Forwarded-* headers Saldo needs for auth cookies + absolute URLs behind the proxy.
+# Replace the hostname and the upstream address.
+
+saldo.your-domain.tld {
+    encode zstd gzip
+
+    # Point at the Proxmox Docker host that runs `docker compose up`.
+    # Same host as Caddy? use 127.0.0.1:3000. Different host? use its LAN IP.
+    reverse_proxy 127.0.0.1:3000 {
+        header_up X-Forwarded-Host  {host}
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Real-IP         {remote_host}
+
+        health_uri      /api/health
+        health_interval 15s
+        health_timeout  5s
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options    "nosniff"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        -Server
+    }
+}
