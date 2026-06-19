@@ -67,7 +67,7 @@ services:
   # Polls GHCR every 5 min; on a new :latest it pulls + recreates the app container
   # (which re-runs migrations on start). Only watches the labelled app.
   watchtower:
-    image: containrrr/watchtower
+    image: ghcr.io/nicholas-fedor/watchtower:latest
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
