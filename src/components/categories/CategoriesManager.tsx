@@ -11,6 +11,7 @@ import {
   archiveSubcategory,
 } from "@/lib/actions/categories";
 import { categoryColor } from "@/lib/colors";
+import { cn } from "@/lib/utils";
 import type { CategoryWithSubs } from "@/lib/queries/categories";
 
 const COLORS = [
@@ -48,24 +49,26 @@ export function CategoriesManager({
 
   return (
     <div className="space-y-5">
-      <div className="flex gap-2 rounded-3xl border border-hairline bg-surface p-4">
-        <ColorSelect value={color} onChange={setColor} />
+      <div className="space-y-3 rounded-3xl border border-hairline bg-surface p-4">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && add()}
           placeholder="New category"
           maxLength={40}
-          className="flex-1 rounded-xl border border-hairline bg-bg px-3.5 py-2 text-sm outline-none placeholder:text-muted focus:border-muted"
+          className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm outline-none placeholder:text-muted focus:border-muted"
         />
-        <button
-          onClick={add}
-          disabled={busy}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
-        >
-          <Plus className="h-4 w-4" />
-          Create
-        </button>
+        <div className="flex items-center justify-between gap-3">
+          <Swatches value={color} onChange={setColor} />
+          <button
+            onClick={add}
+            disabled={busy || !name.trim()}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+          >
+            <Plus className="h-4 w-4" />
+            Create
+          </button>
+        </div>
       </div>
 
       {categories.map((c) => (
@@ -157,6 +160,33 @@ function CategoryCard({ category }: { category: CategoryWithSubs }) {
           className="w-32 rounded-full border border-dashed border-hairline bg-transparent px-3 py-1 text-sm outline-none placeholder:text-muted focus:border-muted"
         />
       </div>
+    </div>
+  );
+}
+
+function Swatches({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {COLORS.map((c) => (
+        <button
+          key={c}
+          type="button"
+          onClick={() => onChange(c)}
+          aria-label={c}
+          aria-pressed={value === c}
+          className={cn(
+            "h-7 w-7 rounded-full ring-2 ring-offset-2 ring-offset-surface transition",
+            value === c ? "ring-fg" : "ring-transparent hover:ring-hairline",
+          )}
+          style={{ backgroundColor: categoryColor(c).cssVar }}
+        />
+      ))}
     </div>
   );
 }

@@ -10,7 +10,19 @@ import { getActiveBook } from "@/lib/queries/active-book";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-const colorEnum = z.enum(["amber", "green", "orange", "blue", "slate"]);
+const colorEnum = z.enum([
+  "amber",
+  "green",
+  "orange",
+  "blue",
+  "slate",
+  "rose",
+  "purple",
+  "teal",
+  "cyan",
+  "pink",
+  "brown",
+]);
 const nameSchema = z.string().trim().min(1).max(40);
 
 function revalidate() {

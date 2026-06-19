@@ -33,6 +33,9 @@ export async function GET(req: NextRequest) {
           ? acc.account_id?.iban
           : acc.account_id) ||
         null;
+      // Re-home the account to whichever book this consent belongs to: connecting a
+      // bank while a book is active makes that book own the account (and resets its
+      // sync floor, so no history floods in). One account lives in exactly one book.
       await db
         .insert(bankAccounts)
         .values({
@@ -41,7 +44,15 @@ export async function GET(req: NextRequest) {
           accountId: acc.uid,
           name,
         })
-        .onConflictDoNothing();
+        .onConflictDoUpdate({
+          target: bankAccounts.accountId,
+          set: {
+            bookId: conn.bookId,
+            connectionId: conn.id,
+            name,
+            syncFrom: new Date(),
+          },
+        });
     }
     await db
       .update(bankConnections)
