@@ -3,7 +3,18 @@
  * (dots, chips, charts) resolves through here so a hue means the same thing app-wide.
  * `cssVar` strings are used directly as SVG/Recharts fills.
  */
-export type CategoryColor = "amber" | "green" | "orange" | "blue" | "slate";
+export type CategoryColor =
+  | "amber"
+  | "green"
+  | "orange"
+  | "blue"
+  | "slate"
+  | "rose"
+  | "purple"
+  | "teal"
+  | "cyan"
+  | "pink"
+  | "brown";
 
 export type ColorTokens = {
   cssVar: string;
@@ -55,6 +66,12 @@ export const CATEGORY_COLORS: Record<CategoryColor, ColorTokens> = {
     bgSoft: "bg-cat-slate-soft",
     border: "border-cat-slate",
   },
+  rose: { cssVar: "var(--cat-rose)", softVar: "var(--cat-rose-soft)", text: "text-cat-rose", bg: "bg-cat-rose", bgSoft: "bg-cat-rose-soft", border: "border-cat-rose" },
+  purple: { cssVar: "var(--cat-purple)", softVar: "var(--cat-purple-soft)", text: "text-cat-purple", bg: "bg-cat-purple", bgSoft: "bg-cat-purple-soft", border: "border-cat-purple" },
+  teal: { cssVar: "var(--cat-teal)", softVar: "var(--cat-teal-soft)", text: "text-cat-teal", bg: "bg-cat-teal", bgSoft: "bg-cat-teal-soft", border: "border-cat-teal" },
+  cyan: { cssVar: "var(--cat-cyan)", softVar: "var(--cat-cyan-soft)", text: "text-cat-cyan", bg: "bg-cat-cyan", bgSoft: "bg-cat-cyan-soft", border: "border-cat-cyan" },
+  pink: { cssVar: "var(--cat-pink)", softVar: "var(--cat-pink-soft)", text: "text-cat-pink", bg: "bg-cat-pink", bgSoft: "bg-cat-pink-soft", border: "border-cat-pink" },
+  brown: { cssVar: "var(--cat-brown)", softVar: "var(--cat-brown-soft)", text: "text-cat-brown", bg: "bg-cat-brown", bgSoft: "bg-cat-brown-soft", border: "border-cat-brown" },
 };
 
 /** Resolve a stored color token to its design tokens, falling back to slate. */

@@ -13,7 +13,19 @@ import {
 import { categoryColor } from "@/lib/colors";
 import type { CategoryWithSubs } from "@/lib/queries/categories";
 
-const COLORS = ["amber", "green", "orange", "blue", "slate"];
+const COLORS = [
+  "amber",
+  "green",
+  "orange",
+  "blue",
+  "slate",
+  "rose",
+  "purple",
+  "teal",
+  "cyan",
+  "pink",
+  "brown",
+];
 
 export function CategoriesManager({
   categories,

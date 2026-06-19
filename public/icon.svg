@@ -1,5 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="116" fill="#137a5f"/>
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="20"/>
-  <text x="256" y="350" font-family="Geist, Inter, system-ui, sans-serif" font-size="300" font-weight="700" fill="#ffffff" text-anchor="middle">S</text>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0e7a5f" />
+      <stop offset="1" stop-color="#18a986" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#g)" />
+  <circle cx="256" cy="256" r="140" fill="#ffffff" />
+  <circle cx="256" cy="256" r="140" fill="none" stroke="#0e7a5f" stroke-opacity="0.12" stroke-width="6" />
+  <text x="256" y="330" font-family="Geist, Inter, system-ui, -apple-system, sans-serif" font-size="210" font-weight="700" fill="#0e7a5f" text-anchor="middle">€</text>
 </svg>
