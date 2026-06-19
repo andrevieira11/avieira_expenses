@@ -7,6 +7,7 @@ import {
   connectBank,
   syncNow,
   disconnectBank,
+  setAutoSync,
 } from "@/lib/actions/banking";
 import type { BankConnectionWithAccounts } from "@/lib/queries/banking";
 import { cn } from "@/lib/utils";
@@ -26,8 +27,10 @@ function timeAgo(d: Date | null): string {
 
 export function BankConnect({
   connections,
+  autoSync,
 }: {
   connections: BankConnectionWithAccounts[];
+  autoSync: boolean;
 }) {
   const [institutions, setInstitutions] = useState<Institution[] | null>(null);
   const [selected, setSelected] = useState("");
@@ -35,6 +38,7 @@ export function BankConnect({
   const [notConfigured, setNotConfigured] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [synced, setSynced] = useState<number | null>(null);
+  const [auto, setAuto] = useState(autoSync);
   const [pending, startTransition] = useTransition();
 
   async function openPicker() {
@@ -82,6 +86,15 @@ export function BankConnect({
     startTransition(async () => {
       await disconnectBank(id);
       window.location.reload();
+    });
+  }
+
+  function toggleAuto() {
+    const next = !auto;
+    setAuto(next); // optimistic
+    startTransition(async () => {
+      const res = await setAutoSync(next);
+      if (!res.ok) setAuto(!next); // revert on failure
     });
   }
 
@@ -136,6 +149,37 @@ export function BankConnect({
             </li>
           ))}
         </ul>
+      )}
+
+      {connections.some((c) => c.accounts.length > 0) && (
+        <div className="flex items-center justify-between rounded-2xl border border-hairline bg-surface px-4 py-3">
+          <div className="min-w-0 pr-3">
+            <p className="text-sm font-medium">Background auto-sync</p>
+            <p className="mt-0.5 text-xs text-muted">
+              Pull this book&apos;s banks every 8h. &ldquo;Sync now&rdquo; and
+              opening the app always work.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={auto}
+            aria-label="Background auto-sync"
+            onClick={toggleAuto}
+            disabled={pending}
+            className={cn(
+              "relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50",
+              auto ? "bg-brand" : "bg-surface-2",
+            )}
+          >
+            <span
+              className={cn(
+                "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all",
+                auto ? "left-[1.375rem]" : "left-0.5",
+              )}
+            />
+          </button>
+        </div>
       )}
 
       {connections.some((c) => c.status === "linked") && (

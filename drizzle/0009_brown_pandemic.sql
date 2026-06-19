@@ -1,0 +1,1 @@
+ALTER TABLE "books" ADD COLUMN "auto_sync" boolean DEFAULT true NOT NULL;

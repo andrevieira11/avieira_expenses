@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { books } from "@/db/schema";
 import { syncBook } from "@/lib/banking/sync";
@@ -23,9 +23,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
+  // Only books that opted into background sync (per-book toggle in Settings).
   const allBooks = await db
     .select({ id: books.id, ownerId: books.ownerId, currency: books.currency })
     .from(books)
+    .where(eq(books.autoSync, true))
     .orderBy(asc(books.createdAt));
 
   let imported = 0;

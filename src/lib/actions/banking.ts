@@ -4,7 +4,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db/client";
-import { bankConnections } from "@/db/schema";
+import { bankConnections, books } from "@/db/schema";
 import { getActiveBook } from "@/lib/queries/active-book";
 import { ebConfigured, listAspsps, startAuth } from "@/lib/banking/enablebanking";
 import { syncBook } from "@/lib/banking/sync";
@@ -72,6 +72,21 @@ export async function syncNow() {
     revalidatePath("/inbox");
     revalidatePath("/settings");
     return { ok: true as const, imported };
+  } catch (e) {
+    return { ok: false as const, error: e instanceof Error ? e.message : "error" };
+  }
+}
+
+export async function setAutoSync(enabled: boolean) {
+  try {
+    const ctx = await getActiveBook();
+    if (!ctx) return { ok: false as const, error: "Session expired" };
+    await db
+      .update(books)
+      .set({ autoSync: enabled })
+      .where(eq(books.id, ctx.book.id));
+    revalidatePath("/settings");
+    return { ok: true as const };
   } catch (e) {
     return { ok: false as const, error: e instanceof Error ? e.message : "error" };
   }

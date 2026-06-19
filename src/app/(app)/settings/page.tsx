@@ -40,7 +40,10 @@ export default async function SettingsPage() {
         title="Bank"
         desc="Auto-import your moey! / Crédito Agrícola transactions into the inbox."
       >
-        <BankConnect connections={bankConnections} />
+        <BankConnect
+          connections={bankConnections}
+          autoSync={ctx.book.autoSync}
+        />
       </Section>
 
       <Section

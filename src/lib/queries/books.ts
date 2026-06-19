@@ -10,6 +10,7 @@ export type UserBook = {
   type: "personal" | "shared";
   currency: string;
   role: "owner" | "member";
+  autoSync: boolean;
 };
 
 /** All books the user is a member of (drives the book switcher). */
@@ -21,6 +22,7 @@ export async function getUserBooks(userId: string): Promise<UserBook[]> {
       type: books.type,
       currency: books.currency,
       role: bookMembers.role,
+      autoSync: books.autoSync,
     })
     .from(bookMembers)
     .innerJoin(books, eq(books.id, bookMembers.bookId))
@@ -30,7 +32,7 @@ export async function getUserBooks(userId: string): Promise<UserBook[]> {
 /** Create a personal book owned by the user and seed it with the category template. */
 export async function createPersonalBook(
   userId: string,
-  name = "Pessoal",
+  name = "Personal",
 ): Promise<string> {
   const bookId = createId();
   await db

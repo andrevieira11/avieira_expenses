@@ -4,6 +4,7 @@ import {
   timestamp,
   index,
   primaryKey,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
@@ -24,6 +25,9 @@ export const books = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "restrict" }),
     archivedAt: timestamp("archived_at"),
+    // Background 8h cron pulls this book's banks only when true (per-book toggle).
+    // Manual "Sync now" and sync-on-open ignore this — they're user-initiated.
+    autoSync: boolean("auto_sync").notNull().default(true),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
