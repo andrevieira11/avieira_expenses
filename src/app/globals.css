@@ -110,6 +110,16 @@ body {
   }
 }
 
+/* Prevent iOS auto-zoom on focus — inputs must be >= 16px on phones. Unlayered so it
+   wins over Tailwind text-sm utilities. */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
 /* Respect the iOS notch / home indicator for bottom-fixed UI. */
 @utility pb-safe {
   padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);

@@ -107,6 +107,15 @@ export default async function HomePage() {
         )}
       </div>
 
+      {budget.overallCents == null && (
+        <Link
+          href="/budgets"
+          className="block rounded-2xl border border-dashed border-hairline px-4 py-3 text-center text-sm text-muted transition hover:bg-surface-2"
+        >
+          Define um orçamento para veres quanto podes gastar
+        </Link>
+      )}
+
       {catTotals.some((c) => c.netCents > 0) && (
         <section className="rounded-3xl border border-hairline bg-surface p-5">
           <h2 className="mb-4 text-sm font-medium text-muted">
