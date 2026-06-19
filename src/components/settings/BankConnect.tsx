@@ -100,7 +100,7 @@ export function BankConnect({
                   {c.institutionName}
                 </p>
                 <p className="mt-0.5 text-xs text-muted">
-                  {c.status === "linked" ? (
+                  {c.status === "linked" && c.accounts.length > 0 ? (
                     <>
                       {c.accounts.length} account
                       {c.accounts.length === 1 ? "" : "s"} · synced{" "}
@@ -112,6 +112,11 @@ export function BankConnect({
                           .at(-1) ?? null,
                       )}
                     </>
+                  ) : c.status === "linked" ? (
+                    <span className="text-over">
+                      no account — whitelist this bank in Enable Banking, then
+                      Connect again
+                    </span>
                   ) : c.status === "error" ? (
                     <span className="text-over">connection error</span>
                   ) : (
