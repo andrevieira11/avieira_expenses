@@ -83,13 +83,17 @@ export async function importHistory() {
   try {
     const ctx = await getActiveBook();
     if (!ctx) return { ok: false as const, error: "Session expired" };
-    const imported = await syncBook(ctx.book.id, ctx.user.id, ctx.book.currency, {
-      fromOverrideDays: 90,
-      ignoreDismissed: true,
-    });
+    const stats = { fetched: 0 };
+    const imported = await syncBook(
+      ctx.book.id,
+      ctx.user.id,
+      ctx.book.currency,
+      { fromOverrideDays: 90, ignoreDismissed: true },
+      stats,
+    );
     revalidatePath("/inbox");
     revalidatePath("/settings");
-    return { ok: true as const, imported };
+    return { ok: true as const, imported, fetched: stats.fetched };
   } catch (e) {
     return { ok: false as const, error: e instanceof Error ? e.message : "error" };
   }

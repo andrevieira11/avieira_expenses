@@ -47,6 +47,7 @@ export function BankConnect({
   const [notConfigured, setNotConfigured] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [synced, setSynced] = useState<number | null>(null);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
   const [auto, setAuto] = useState(autoSync);
   const [pending, startTransition] = useTransition();
 
@@ -84,6 +85,7 @@ export function BankConnect({
   function sync() {
     setError(null);
     setSynced(null);
+    setImportMsg(null);
     startTransition(async () => {
       const res = await syncNow();
       if (!res.ok) setError(res.error);
@@ -94,10 +96,16 @@ export function BankConnect({
   function importOlder() {
     setError(null);
     setSynced(null);
+    setImportMsg(null);
     startTransition(async () => {
       const res = await importHistory();
       if (!res.ok) setError(res.error);
-      else setSynced(res.imported);
+      else
+        setImportMsg(
+          `Bank returned ${res.fetched} transaction${
+            res.fetched === 1 ? "" : "s"
+          } · imported ${res.imported} new.`,
+        );
     });
   }
 
@@ -237,6 +245,8 @@ export function BankConnect({
             : `Imported ${synced} new transaction${synced === 1 ? "" : "s"} to the inbox.`}
         </p>
       )}
+
+      {importMsg && <p className="text-sm text-muted">{importMsg}</p>}
 
       {/* Add a connection */}
       {institutions == null ? (

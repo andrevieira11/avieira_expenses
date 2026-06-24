@@ -1,10 +1,9 @@
 import { and, eq, inArray } from "drizzle-orm";
+import { createHash } from "node:crypto";
 import { db } from "@/db/client";
 import { bankAccounts, bankDismissed, transactions } from "@/db/schema";
 import { getAccountTransactions, type EbTransaction } from "./enablebanking";
 import { findRule } from "@/lib/queries/rules";
-
-const extId = (t: EbTransaction) => t.transaction_id || t.entry_reference;
 
 const ymd = (s: string | undefined) =>
   s && /^\d{4}-\d{2}-\d{2}/.test(s)
@@ -15,6 +14,34 @@ const ymd = (s: string | undefined) =>
 const daysAgo = (days: number) =>
   new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
 
+const remitOf = (t: EbTransaction) =>
+  (
+    t.remittance_information?.join(" ") ||
+    t.creditor?.name ||
+    t.debtor?.name ||
+    ""
+  )
+    .toLowerCase()
+    .trim();
+
+/**
+ * Stable content key for transactions the bank doesn't give a real id for (often pending):
+ * date + amount + party/description. Lets a pending spend show up now, then dedupe against
+ * its own booked version later (which carries the same content) instead of duplicating.
+ */
+const contentKey = (t: EbTransaction) =>
+  "c_" +
+  createHash("sha1")
+    .update(
+      `${ymd(t.booking_date || t.value_date || t.transaction_date)}|${
+        t.transaction_amount?.amount ?? ""
+      }|${remitOf(t)}`,
+    )
+    .digest("hex")
+    .slice(0, 22);
+
+const primaryId = (t: EbTransaction) => t.transaction_id || t.entry_reference;
+
 export type SyncOptions = {
   /** Ignore each account's sync floor and pull this many days of history (recovery). */
   fromOverrideDays?: number;
@@ -23,15 +50,16 @@ export type SyncOptions = {
 };
 
 /**
- * Pull new bank transactions for every linked account of a book into the pending inbox.
- * Dedupes by the bank's transaction id (transactions.external_id), skips ids the user
- * dismissed, and auto-categorizes via saved rules. Returns how many were imported.
+ * Pull new bank transactions (booked + pending) for every linked account of a book into the
+ * pending inbox. Dedupes by the bank id AND a content key, skips dismissed ids, auto-categorizes
+ * via saved rules. Returns how many were imported. Throws if every account's fetch failed.
  */
 export async function syncBook(
   bookId: string,
   ownerId: string,
   fallbackCurrency: string,
   opts: SyncOptions = {},
+  stats?: { fetched: number },
 ): Promise<number> {
   const accounts = await db
     .select()
@@ -39,7 +67,6 @@ export async function syncBook(
     .where(eq(bankAccounts.bookId, bookId));
   if (accounts.length === 0) return 0;
 
-  // Ids the user explicitly removed — never bring them back (unless doing a full recovery).
   const dismissed = opts.ignoreDismissed
     ? new Set<string>()
     : new Set(
@@ -52,13 +79,14 @@ export async function syncBook(
       );
 
   let imported = 0;
+  let errors = 0;
+  let firstError: string | null = null;
 
   for (const acc of accounts) {
     let from: string;
     if (opts.fromOverrideDays != null) {
-      from = daysAgo(opts.fromOverrideDays); // recovery: ignore the per-account floor
+      from = daysAgo(opts.fromOverrideDays);
     } else {
-      // Floor at link time so a fresh account brings no history; re-pull a 7d overlap after.
       const floor = acc.syncFrom.toISOString().slice(0, 10);
       const overlap = acc.lastSyncedAt ? daysAgo(7) : floor;
       from = overlap > floor ? overlap : floor;
@@ -67,28 +95,44 @@ export async function syncBook(
     let fetched: EbTransaction[] = [];
     try {
       fetched = await getAccountTransactions(acc.accountId, from);
-    } catch {
-      continue; // a rate-limited / errored account shouldn't block the rest
+    } catch (e) {
+      errors++;
+      firstError ||= e instanceof Error ? e.message : "Bank fetch failed";
+      continue;
     }
+    if (stats) stats.fetched += fetched.length;
 
     if (fetched.length > 0) {
-      const ids = fetched.map(extId).filter((x): x is string => Boolean(x));
-      const existing = ids.length
+      // Existing ids (real + content) already in this book, to dedupe against.
+      const candidateIds = fetched.flatMap((t) => {
+        const pk = primaryId(t);
+        const ck = contentKey(t);
+        return pk ? [pk, ck] : [ck];
+      });
+      const existing = candidateIds.length
         ? await db
             .select({ e: transactions.externalId })
             .from(transactions)
             .where(
               and(
                 eq(transactions.bookId, bookId),
-                inArray(transactions.externalId, ids),
+                inArray(transactions.externalId, candidateIds),
               ),
             )
         : [];
       const seen = new Set(existing.map((r) => r.e));
 
       for (const t of fetched) {
-        const id = extId(t);
-        if (!id || seen.has(id) || dismissed.has(id)) continue;
+        const pk = primaryId(t);
+        const ck = contentKey(t);
+        const id = pk || ck;
+        if (
+          (pk && (seen.has(pk) || dismissed.has(pk))) ||
+          seen.has(ck) ||
+          dismissed.has(ck)
+        ) {
+          continue;
+        }
 
         const magnitude = parseFloat(t.transaction_amount?.amount ?? "");
         if (!Number.isFinite(magnitude)) continue;
@@ -122,7 +166,8 @@ export async function syncBook(
           externalId: id,
           createdBy: ownerId,
         });
-        seen.add(id);
+        if (pk) seen.add(pk);
+        seen.add(ck);
         imported++;
       }
     }
@@ -132,6 +177,9 @@ export async function syncBook(
       .set({ lastSyncedAt: new Date() })
       .where(eq(bankAccounts.id, acc.id));
   }
+
+  // Surface a genuine API failure instead of a misleading "nothing new".
+  if (errors === accounts.length && firstError) throw new Error(firstError);
 
   return imported;
 }
