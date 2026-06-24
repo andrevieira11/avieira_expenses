@@ -1,6 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
-import { bankAccounts, transactions } from "@/db/schema";
+import { bankAccounts, bankDismissed, transactions } from "@/db/schema";
 import { getAccountTransactions, type EbTransaction } from "./enablebanking";
 import { findRule } from "@/lib/queries/rules";
 
@@ -15,29 +15,54 @@ const ymd = (s: string | undefined) =>
 const daysAgo = (days: number) =>
   new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
 
+export type SyncOptions = {
+  /** Ignore each account's sync floor and pull this many days of history (recovery). */
+  fromOverrideDays?: number;
+  /** Also re-import transactions the user previously cleared/deleted (full recovery). */
+  ignoreDismissed?: boolean;
+};
+
 /**
  * Pull new bank transactions for every linked account of a book into the pending inbox.
- * Dedupes by the bank's transaction id (stored as transactions.external_id) and
- * auto-categorizes via saved rules. Returns how many were imported.
+ * Dedupes by the bank's transaction id (transactions.external_id), skips ids the user
+ * dismissed, and auto-categorizes via saved rules. Returns how many were imported.
  */
 export async function syncBook(
   bookId: string,
   ownerId: string,
   fallbackCurrency: string,
+  opts: SyncOptions = {},
 ): Promise<number> {
   const accounts = await db
     .select()
     .from(bankAccounts)
     .where(eq(bankAccounts.bookId, bookId));
+  if (accounts.length === 0) return 0;
+
+  // Ids the user explicitly removed — never bring them back (unless doing a full recovery).
+  const dismissed = opts.ignoreDismissed
+    ? new Set<string>()
+    : new Set(
+        (
+          await db
+            .select({ e: bankDismissed.externalId })
+            .from(bankDismissed)
+            .where(eq(bankDismissed.bookId, bookId))
+        ).map((r) => r.e),
+      );
 
   let imported = 0;
 
   for (const acc of accounts) {
-    // Floor at link time so a freshly connected account brings NO history backfill —
-    // only spends from when you connected it. Later syncs re-pull a 7d overlap (dedup handles it).
-    const floor = acc.syncFrom.toISOString().slice(0, 10);
-    const overlap = acc.lastSyncedAt ? daysAgo(7) : floor;
-    const from = overlap > floor ? overlap : floor;
+    let from: string;
+    if (opts.fromOverrideDays != null) {
+      from = daysAgo(opts.fromOverrideDays); // recovery: ignore the per-account floor
+    } else {
+      // Floor at link time so a fresh account brings no history; re-pull a 7d overlap after.
+      const floor = acc.syncFrom.toISOString().slice(0, 10);
+      const overlap = acc.lastSyncedAt ? daysAgo(7) : floor;
+      from = overlap > floor ? overlap : floor;
+    }
 
     let fetched: EbTransaction[] = [];
     try {
@@ -63,7 +88,7 @@ export async function syncBook(
 
       for (const t of fetched) {
         const id = extId(t);
-        if (!id || seen.has(id)) continue;
+        if (!id || seen.has(id) || dismissed.has(id)) continue;
 
         const magnitude = parseFloat(t.transaction_amount?.amount ?? "");
         if (!Number.isFinite(magnitude)) continue;

@@ -1,13 +1,22 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Landmark, RefreshCw, Plug, Unplug, Loader2, Check } from "lucide-react";
+import {
+  Landmark,
+  RefreshCw,
+  Plug,
+  Unplug,
+  Loader2,
+  Check,
+  History,
+} from "lucide-react";
 import {
   getInstitutions,
   connectBank,
   syncNow,
   disconnectBank,
   setAutoSync,
+  importHistory,
 } from "@/lib/actions/banking";
 import type { BankConnectionWithAccounts } from "@/lib/queries/banking";
 import { cn } from "@/lib/utils";
@@ -77,6 +86,16 @@ export function BankConnect({
     setSynced(null);
     startTransition(async () => {
       const res = await syncNow();
+      if (!res.ok) setError(res.error);
+      else setSynced(res.imported);
+    });
+  }
+
+  function importOlder() {
+    setError(null);
+    setSynced(null);
+    startTransition(async () => {
+      const res = await importHistory();
       if (!res.ok) setError(res.error);
       else setSynced(res.imported);
     });
@@ -183,19 +202,31 @@ export function BankConnect({
       )}
 
       {connections.some((c) => c.status === "linked") && (
-        <button
-          type="button"
-          onClick={sync}
-          disabled={pending}
-          className="inline-flex items-center gap-2 rounded-xl border border-hairline bg-surface px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2 disabled:opacity-50"
-        >
-          {pending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <RefreshCw className="h-4 w-4" />
-          )}
-          Sync now
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={sync}
+            disabled={pending}
+            className="inline-flex items-center gap-2 rounded-xl border border-hairline bg-surface px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2 disabled:opacity-50"
+          >
+            {pending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
+            Sync now
+          </button>
+          <button
+            type="button"
+            onClick={importOlder}
+            disabled={pending}
+            title="Pull the full ~90 days the bank exposes, including anything you cleared. Use if a transaction is missing."
+            className="inline-flex items-center gap-2 rounded-xl border border-hairline px-3.5 py-2 text-sm font-medium text-muted transition hover:bg-surface-2 disabled:opacity-50"
+          >
+            <History className="h-4 w-4" />
+            Import last 90 days
+          </button>
+        </div>
       )}
 
       {synced != null && (

@@ -4,7 +4,12 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { transactions, categories, subcategories } from "@/db/schema";
+import {
+  transactions,
+  categories,
+  subcategories,
+  bankDismissed,
+} from "@/db/schema";
 import { getActiveBook } from "@/lib/queries/active-book";
 import { learnRule } from "@/lib/queries/rules";
 import { resolveBudget } from "@/lib/queries/budgets";
@@ -186,9 +191,21 @@ export async function deleteTransaction(id: string): Promise<ActionResult> {
     const result = await db
       .delete(transactions)
       .where(and(eq(transactions.id, id), eq(transactions.bookId, ctx.book.id)))
-      .returning({ id: transactions.id });
+      .returning({
+        id: transactions.id,
+        source: transactions.source,
+        externalId: transactions.externalId,
+      });
 
     if (!result.length) return { ok: false, error: "Transaction not found" };
+
+    // A deleted bank transaction shouldn't re-import on the next sync.
+    if (result[0].source === "bank" && result[0].externalId) {
+      await db
+        .insert(bankDismissed)
+        .values({ bookId: ctx.book.id, externalId: result[0].externalId })
+        .onConflictDoNothing();
+    }
 
     revalidate();
     return { ok: true };

@@ -3,6 +3,7 @@ import {
   text,
   timestamp,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
@@ -51,6 +52,23 @@ export const bankAccounts = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (t) => [index("bank_accounts_book_idx").on(t.bookId)],
+);
+
+/** Bank transaction ids the user explicitly removed/cleared — never re-import them.
+ *  Lets the inbox be decluttered without blinding sync to genuinely new transactions. */
+export const bankDismissed = pgTable(
+  "bank_dismissed",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    bookId: text("book_id")
+      .notNull()
+      .references(() => books.id, { onDelete: "cascade" }),
+    externalId: text("external_id").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("bank_dismissed_book_ext_uq").on(t.bookId, t.externalId)],
 );
 
 export const bankConnectionsRelations = relations(
