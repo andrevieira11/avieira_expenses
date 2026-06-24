@@ -8,6 +8,13 @@ moey! bank notifications, budgets with goal tracking, and month/year analytics. 
 the owner's Proxmox (Docker behind Caddy). Single user now, architected for multi-user
 "books" (personal + shared *conjoint*) later.
 
+## Deployment rule (do not violate)
+- NEVER build this app on the server / Proxmox VM 100 — builds freeze the whole VM.
+- Images are built and pushed from the PC (or CI), tagged :latest and the git SHA.
+- The server compose uses `image:` only — it must never contain a `build:` section for this app.
+- Deploying on the server means exactly: docker compose pull && docker compose up -d. Nothing else.
+- If I say "deploy" / "ship" / "push it", run the PC build+push then the remote pull — do not add a server-side build.
+
 ## Persistent memory (read at session start)
 
 Memory lives at `~/.claude/projects/G--Projects-Git-avieira-expenses/memory/`:
