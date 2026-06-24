@@ -160,7 +160,7 @@ export async function getPendingTransactions(bookId: string) {
         eq(transactions.status, "pending_category"),
       ),
     )
-    .orderBy(desc(transactions.createdAt));
+    .orderBy(desc(transactions.txDate), desc(transactions.createdAt));
 }
 
 export async function getPendingCount(bookId: string): Promise<number> {

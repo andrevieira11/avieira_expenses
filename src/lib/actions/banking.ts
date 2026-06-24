@@ -68,12 +68,34 @@ export async function syncNow() {
   try {
     const ctx = await getActiveBook();
     if (!ctx) return { ok: false as const, error: "Session expired" };
-    const imported = await syncBook(ctx.book.id, ctx.user.id, ctx.book.currency);
+    const imported = await syncBook(
+      ctx.book.id,
+      ctx.user.id,
+      ctx.book.currency,
+      { force: true }, // user pressed the button — bypass the cooldown
+    );
     revalidatePath("/inbox");
     revalidatePath("/settings");
     return { ok: true as const, imported };
   } catch (e) {
     return { ok: false as const, error: e instanceof Error ? e.message : "error" };
+  }
+}
+
+/** Opportunistic sync when the app opens/foregrounds — respects the per-account cooldown
+ *  so it never trips the bank's daily access cap. Silent on failure. */
+export async function syncOnOpen() {
+  try {
+    const ctx = await getActiveBook();
+    if (!ctx) return { ok: false as const, error: "no_session" };
+    const imported = await syncBook(ctx.book.id, ctx.user.id, ctx.book.currency);
+    if (imported > 0) {
+      revalidatePath("/inbox");
+      revalidatePath("/");
+    }
+    return { ok: true as const, imported };
+  } catch {
+    return { ok: false as const, error: "sync_failed" };
   }
 }
 
@@ -88,7 +110,7 @@ export async function importHistory() {
       ctx.book.id,
       ctx.user.id,
       ctx.book.currency,
-      { fromOverrideDays: 90, ignoreDismissed: true },
+      { fromOverrideDays: 90, ignoreDismissed: true, force: true },
       stats,
     );
     revalidatePath("/inbox");

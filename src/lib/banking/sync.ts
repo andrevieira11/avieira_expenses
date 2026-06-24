@@ -42,11 +42,25 @@ const contentKey = (t: EbTransaction) =>
 
 const primaryId = (t: EbTransaction) => t.transaction_id || t.entry_reference;
 
+/** Tidy a raw bank description for display: drop ref numbers + leading payment verbs. */
+const cleanMerchant = (s: string) =>
+  s
+    .replace(/\b\d{4,}\b/g, " ")
+    .replace(/^\s*(compra|pagamento|pag|trf|levantamento)\s+/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+// Banks cap unattended access at ~4 fetches/day. Skip automatic pulls within this window
+// of the last real fetch so we never trip "exceeded consented multiplicity".
+const COOLDOWN_MS = 6 * 60 * 60 * 1000;
+
 export type SyncOptions = {
   /** Ignore each account's sync floor and pull this many days of history (recovery). */
   fromOverrideDays?: number;
   /** Also re-import transactions the user previously cleared/deleted (full recovery). */
   ignoreDismissed?: boolean;
+  /** User-initiated: bypass the per-account cooldown (manual Sync now / Import). */
+  force?: boolean;
 };
 
 /**
@@ -83,6 +97,14 @@ export async function syncBook(
   let firstError: string | null = null;
 
   for (const acc of accounts) {
+    if (
+      !opts.force &&
+      acc.lastSyncedAt &&
+      Date.now() - acc.lastSyncedAt.getTime() < COOLDOWN_MS
+    ) {
+      continue; // too soon for an automatic pull — protect the daily quota
+    }
+
     let from: string;
     if (opts.fromOverrideDays != null) {
       from = daysAgo(opts.fromOverrideDays);
@@ -142,12 +164,15 @@ export async function syncBook(
         const amountCents = isIn ? -cents : cents;
 
         const remittance = t.remittance_information?.join(" ").trim() || null;
-        const merchant =
+        const rawMerchant =
           (isIn ? t.debtor?.name : t.creditor?.name) ||
           t.creditor?.name ||
           t.debtor?.name ||
           remittance ||
           null;
+        const merchant = rawMerchant
+          ? cleanMerchant(rawMerchant) || rawMerchant
+          : null;
 
         const rule = await findRule(bookId, { externalId: id, merchant });
 

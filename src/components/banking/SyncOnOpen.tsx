@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { syncNow } from "@/lib/actions/banking";
+import { syncOnOpen } from "@/lib/actions/banking";
 
 const KEY = "saldo:lastBankSync";
 const MIN_MS = 15 * 60 * 1000; // don't re-pull more than every 15 min
@@ -25,7 +25,7 @@ export function SyncOnOpen() {
       running.current = true;
       localStorage.setItem(KEY, String(Date.now())); // optimistic throttle
       try {
-        const res = await syncNow();
+        const res = await syncOnOpen();
         if (res.ok && res.imported > 0) router.refresh();
       } catch {
         // silent — never disrupt the UI for a background pull

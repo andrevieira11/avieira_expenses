@@ -4,6 +4,23 @@ import { merchantRules } from "@/db/schema";
 
 export type RuleMatch = { categoryId: string; subcategoryId: string | null };
 
+/** Normalize a merchant/bank description for matching: strip accents, ref numbers and a
+ *  leading payment verb so "COMPRA BCM BRICOLAGE 6470482" matches a future "...BRICOLAGE 12". */
+export function normalizeMerchant(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/\b\d{3,}\b/g, " ")
+    .replace(
+      /^\s*(compra|pagamento|pagam|pag|paga|levantamento|trf|transferencia|mb\s*way|mbway|sepa)\s+/,
+      "",
+    )
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /** Find a saved category rule for a capture — by external id first, then merchant text. */
 export async function findRule(
   bookId: string,
@@ -25,8 +42,8 @@ export async function findRule(
       .limit(1);
     if (r) return r;
   }
-  if (keys.merchant) {
-    const norm = keys.merchant.toLowerCase().trim();
+  const norm = keys.merchant ? normalizeMerchant(keys.merchant) : "";
+  if (norm) {
     const [r] = await db
       .select({
         categoryId: merchantRules.categoryId,
@@ -67,7 +84,7 @@ export async function learnRule(
         bookId,
         externalId: data.externalId,
         normalizedMerchant: data.merchant
-          ? data.merchant.toLowerCase().trim()
+          ? normalizeMerchant(data.merchant) || null
           : null,
         categoryId: data.categoryId,
         subcategoryId: sub,
@@ -82,7 +99,8 @@ export async function learnRule(
         },
       });
   } else if (data.merchant) {
-    const norm = data.merchant.toLowerCase().trim();
+    const norm = normalizeMerchant(data.merchant);
+    if (!norm) return;
     await db
       .insert(merchantRules)
       .values({
