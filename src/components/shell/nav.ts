@@ -9,6 +9,7 @@ import {
   Repeat,
   HandCoins,
   Landmark,
+  ChartLine,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -27,6 +28,7 @@ export const PRIMARY_NAV: NavItem[] = [
 export const SECONDARY_NAV: NavItem[] = [
   { href: "/transactions", label: "Transactions", icon: ReceiptText },
   { href: "/budgets", label: "Budgets", icon: Target },
+  { href: "/compare", label: "Compare", icon: ChartLine },
   { href: "/subscriptions", label: "Subscriptions", icon: Repeat },
   { href: "/goals", label: "Goals", icon: PiggyBank },
   { href: "/mortgage", label: "Mortgage", icon: Landmark },

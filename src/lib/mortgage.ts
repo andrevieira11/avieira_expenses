@@ -1,38 +1,44 @@
 /**
  * House mortgage math (BPI "C.HABITACAO TX MISTA"). Pure functions on integer cents and
- * YYYY-MM-DD strings; instalments fall on the 5th. The loan facts come from the BPI app.
+ * YYYY-MM-DD strings; instalments fall on the 5th. The loan facts come from BPI's offer letter
+ * (FINE, 24 Mar 2026) and reproduce the bank statements to the cent.
  */
 
 export type Loan = {
   name: string;
-  /** Balance right after the instalment on `knownAfter`, as shown in the bank app. */
-  knownBalanceCents: number;
-  knownAfter: string;
-  /** Opening principal, worked back from the instalment, rate and term. */
   principalCents: number;
   paymentCents: number;
   firstPayment: string;
   lastPayment: string;
-  /** Annual rate in percent while fixed, and the day the fixed period ends. */
+  /** Annual rate in percent while fixed, and the first instalment at the variable rate. */
   fixedRatePct: number;
-  fixedUntil: string;
+  variableFrom: string;
+  /** Variable rate = Euribor 6 months + spread (the spread holds while the BPI bundle is kept). */
+  spreadPct: number;
+  euriborAtSigningPct: number;
 };
 
 export const MORTGAGE: Loan = {
   name: "BPI house mortgage",
-  knownBalanceCents: 31744932,
-  knownAfter: "2026-10-05",
-  principalCents: 32050709,
+  principalCents: 32000000,
   paymentCents: 114810,
-  firstPayment: "2026-05-05",
+  firstPayment: "2026-06-05",
   lastPayment: "2060-05-05",
   fixedRatePct: 2.4,
-  fixedUntil: "2029-05-05",
+  variableFrom: "2029-06-05",
+  spreadPct: 0.7,
+  euriborAtSigningPct: 2.144,
 };
 
-/** Early repayment fee caps in Portugal (DL 74-A/2017): 2% while the rate is fixed, 0.5% when variable. */
+/** Early repayment fee in the contract: 2% while the rate is fixed, 0.5% when variable, plus 4% stamp duty on the fee. */
 export const FEE_FIXED_PCT = 2;
 export const FEE_VARIABLE_PCT = 0.5;
+export const FEE_STAMP_DUTY_PCT = 4;
+
+export function repaymentFee(loan: Loan, onDate: string, lumpCents: number): number {
+  const pct = onDate < loan.variableFrom ? FEE_FIXED_PCT : FEE_VARIABLE_PCT;
+  return Math.round(((lumpCents * pct) / 100) * (1 + FEE_STAMP_DUTY_PCT / 100));
+}
 
 export function addMonths(ymd: string, n: number): string {
   const [y, m, d] = ymd.split("-").map(Number);
@@ -75,10 +81,13 @@ export function monthsToClear(balanceCents: number, paymentCents: number, ratePc
   return n;
 }
 
-/** Where the loan stands on `today`: balance, payments made and the next instalment date. */
+/**
+ * Where the loan stands on `today`: balance, payments made and the next instalment date.
+ * Exact during the fixed period; after it, the bank statement is the source of truth.
+ */
 export function loanStatus(loan: Loan, today: string) {
-  let balance = loan.knownBalanceCents;
-  let last = loan.knownAfter;
+  let balance = loan.principalCents;
+  let last = addMonths(loan.firstPayment, -1);
   while (addMonths(last, 1) <= today && balance > 0) {
     balance -= Math.min(loan.paymentCents - monthlyInterest(balance, loan.fixedRatePct), balance);
     last = addMonths(last, 1);
@@ -113,7 +122,7 @@ export function runPlan(opts: {
   paymentCents: number;
   extraMonthlyCents: number;
   nextPayment: string;
-  fixedUntil: string;
+  variableFrom: string;
   fixedRatePct: number;
   laterRatePct: number;
 }): Plan {
@@ -123,19 +132,19 @@ export function runPlan(opts: {
   let date = opts.nextPayment;
   let interest = 0;
   let months = 0;
-  let repriced = opts.nextPayment >= opts.fixedUntil;
+  let repriced = opts.nextPayment >= opts.variableFrom;
   if (repriced && opts.laterRatePct !== opts.fixedRatePct) {
     pay = annuity(b, opts.laterRatePct, monthsToClear(b, pay, opts.fixedRatePct));
   }
   payAfter = pay;
   while (b > 0) {
-    if (!repriced && date >= opts.fixedUntil) {
+    if (!repriced && date >= opts.variableFrom) {
       const left = monthsToClear(b, pay, opts.fixedRatePct);
       pay = annuity(b, opts.laterRatePct, left === Infinity ? 1200 : left);
       payAfter = pay;
       repriced = true;
     }
-    const rate = date < opts.fixedUntil ? opts.fixedRatePct : opts.laterRatePct;
+    const rate = date < opts.variableFrom ? opts.fixedRatePct : opts.laterRatePct;
     const i = monthlyInterest(b, rate);
     const principal = pay + opts.extraMonthlyCents - i;
     if (principal <= 0 || months > 1200) {
@@ -178,7 +187,7 @@ export function simulate(
   const s = loanStatus(loan, today);
   const common = {
     nextPayment: s.nextPayment,
-    fixedUntil: loan.fixedUntil,
+    variableFrom: loan.variableFrom,
     fixedRatePct: loan.fixedRatePct,
     laterRatePct: opts.laterRatePct,
   };
@@ -192,8 +201,7 @@ export function simulate(
     after <= 0
       ? { months: 0, endDate: today, interestCents: 0, paymentNowCents: 0, paymentAfterFixedCents: 0, never: false }
       : runPlan({ ...common, balanceCents: after, paymentCents: payment, extraMonthlyCents: Math.max(0, opts.extraMonthlyCents) });
-  const feePct = today < loan.fixedUntil ? FEE_FIXED_PCT : FEE_VARIABLE_PCT;
-  const feeCents = Math.round((lump * feePct) / 100);
+  const feeCents = repaymentFee(loan, s.nextPayment, lump);
   const interestSavedCents = base.interestCents - plan.interestCents;
   return {
     base,

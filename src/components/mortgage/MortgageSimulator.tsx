@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { formatMoney } from "@/lib/money";
-import { MORTGAGE, loanStatus, simulate } from "@/lib/mortgage";
+import { MORTGAGE, addMonths, loanStatus, simulate } from "@/lib/mortgage";
 
 const monthYear = (ymd: string) =>
   new Intl.DateTimeFormat("en-IE", { month: "short", year: "numeric" }).format(
@@ -17,11 +17,15 @@ const duration = (months: number) => {
 
 const euros = (cents: number) => formatMoney(Math.round(cents / 100) * 100);
 
+const VARIABLE_FROM = MORTGAGE.variableFrom;
+const FIXED_LAST = addMonths(VARIABLE_FROM, -1);
+const CONTRACT_RATE = Math.round((MORTGAGE.euriborAtSigningPct + MORTGAGE.spreadPct) * 10) / 10;
+
 export function MortgageSimulator({ today }: { today: string }) {
   const status = useMemo(() => loanStatus(MORTGAGE, today), [today]);
   const [lump, setLump] = useState(10000);
   const [extra, setExtra] = useState(0);
-  const [laterRate, setLaterRate] = useState(MORTGAGE.fixedRatePct);
+  const [laterRate, setLaterRate] = useState(CONTRACT_RATE);
   const [mode, setMode] = useState<"shorter" | "lower">("shorter");
 
   const sim = useMemo(
@@ -32,6 +36,20 @@ export function MortgageSimulator({ today }: { today: string }) {
         laterRatePct: laterRate,
         mode,
       }),
+    [today, lump, extra, laterRate, mode],
+  );
+
+  // The same lump paid on the first variable-rate instalment instead, when the fee drops to 0.5%.
+  const wait = useMemo(
+    () =>
+      today < VARIABLE_FROM && lump > 0
+        ? simulate(MORTGAGE, FIXED_LAST.slice(0, 8) + "20", {
+            lumpCents: lump * 100,
+            extraMonthlyCents: extra * 100,
+            laterRatePct: laterRate,
+            mode,
+          })
+        : null,
     [today, lump, extra, laterRate, mode],
   );
 
@@ -59,7 +77,7 @@ export function MortgageSimulator({ today }: { today: string }) {
         <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
           <Fact label="Next payment" value={`${formatMoney(MORTGAGE.paymentCents)} · ${status.nextPayment.slice(8)}/${status.nextPayment.slice(5, 7)}`} />
           <Fact label="Payments" value={`${status.paymentsMade} of ${status.paymentsTotal}`} />
-          <Fact label="Rate" value={`${MORTGAGE.fixedRatePct}% fixed to ${monthYear(MORTGAGE.fixedUntil)}`} />
+          <Fact label="Rate" value={`${MORTGAGE.fixedRatePct}% fixed to ${monthYear(FIXED_LAST)}`} />
           <Fact label="Ends" value={monthYear(MORTGAGE.lastPayment)} />
         </div>
         <p className="text-xs text-muted">
@@ -98,7 +116,7 @@ export function MortgageSimulator({ today }: { today: string }) {
 
         <div className="space-y-2">
           <div className="flex items-baseline justify-between">
-            <label htmlFor="rate" className="text-sm">Rate after {monthYear(MORTGAGE.fixedUntil)} (guess)</label>
+            <label htmlFor="rate" className="text-sm">Rate from {monthYear(VARIABLE_FROM)} (Euribor 6M + {MORTGAGE.spreadPct.toFixed(2)}%)</label>
             <span className="font-mono text-sm tabular-nums">{laterRate.toFixed(1)}%</span>
           </div>
           <input id="rate" type="range" min={1} max={6} step={0.1}
@@ -124,16 +142,25 @@ export function MortgageSimulator({ today }: { today: string }) {
               hint={sim.plan.paymentNowCents < MORTGAGE.paymentCents ? `${formatMoney(MORTGAGE.paymentCents - sim.plan.paymentNowCents)} less` : "same"} />
             <Result label="Interest saved" value={euros(sim.interestSavedCents)} good />
             <Result label="Bank fee (max)" value={formatMoney(sim.feeCents)}
-              hint={today < MORTGAGE.fixedUntil ? "2% while fixed" : "0.5% when variable"} />
+              hint={today < VARIABLE_FROM ? "2% while fixed + stamp duty" : "0.5% + stamp duty"} />
             <div className="col-span-2 rounded-2xl bg-bg p-3">
               <p className="text-xs text-muted">Net gain after the fee</p>
               <p className="font-mono text-xl font-semibold tabular-nums">{euros(sim.netSavedCents)}</p>
+              {wait && (
+                <p className="mt-1 text-xs text-muted">
+                  Waiting until {monthYear(VARIABLE_FROM)} (0.5% fee): {euros(wait.netSavedCents)}.{" "}
+                  {sim.netSavedCents >= wait.netSavedCents
+                    ? `Paying now is ${euros(sim.netSavedCents - wait.netSavedCents)} better.`
+                    : `Waiting is ${euros(wait.netSavedCents - sim.netSavedCents)} better.`}
+                </p>
+              )}
             </div>
           </div>
         )}
         <p className="text-xs text-muted">
-          Estimates. After the fixed period the bank re-prices the instalment; the rate there is a guess.
-          Ask BPI for the exact early repayment simulation before paying.
+          From the BPI contract: {MORTGAGE.fixedRatePct}% fixed for 36 instalments, then Euribor 6M + {MORTGAGE.spreadPct.toFixed(2)}%
+          ({CONTRACT_RATE}% at signing) while you keep the salary account, life and home insurance at BPI, otherwise
+          + 1.50%. Extra payments go on an instalment date, asked 7 working days before. Ask BPI for the exact figure first.
         </p>
       </section>
     </div>

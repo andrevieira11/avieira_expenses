@@ -357,3 +357,32 @@ export async function getAllTransactionsForExport(bookId: string) {
     .where(eq(transactions.bookId, bookId))
     .orderBy(desc(transactions.txDate), desc(transactions.createdAt));
 }
+
+/**
+ * Spending per month from `fromYmd` on, one row per (month, item). With a category the items
+ * are its subcategories (null = no subcategory); without, the items are the categories.
+ */
+export async function getCompareRows(bookId: string, categoryId: string | null, fromYmd: string) {
+  const base = and(
+    eq(transactions.bookId, bookId),
+    eq(transactions.status, "confirmed"),
+    ne(transactions.type, "income"),
+    gte(transactions.txDate, fromYmd),
+  );
+  const ym = sql<string>`to_char(${transactions.txDate}, 'YYYY-MM')`;
+  const cents = sql<number>`coalesce(sum(${transactions.amountCents}), 0)::int`;
+  if (categoryId) {
+    return db
+      .select({ ym, id: transactions.subcategoryId, name: subcategories.name, cents })
+      .from(transactions)
+      .leftJoin(subcategories, eq(subcategories.id, transactions.subcategoryId))
+      .where(and(base, eq(transactions.categoryId, categoryId)))
+      .groupBy(ym, transactions.subcategoryId, subcategories.name);
+  }
+  return db
+    .select({ ym, id: transactions.categoryId, name: categories.name, cents })
+    .from(transactions)
+    .leftJoin(categories, eq(categories.id, transactions.categoryId))
+    .where(base)
+    .groupBy(ym, transactions.categoryId, categories.name);
+}
